@@ -6,12 +6,14 @@
 #define ESTIMATION_PROJECT_2016_ESTIMATIONTPTYPEDEFINITIONS_H
 
 #include </usr/include/eigen3/Eigen/Dense>
+#include <functional>
 
 using namespace Eigen;
 
 typedef double dataType;
-typedef Matrix<dataType, 3,1> StateVector;
-typedef Matrix<dataType, 3,3> SystemMatrix;
+typedef double timeType;
+typedef Matrix<dataType, 4,1> StateVector;
+typedef Matrix<dataType, 4,4> SystemMatrix;
 
 
 

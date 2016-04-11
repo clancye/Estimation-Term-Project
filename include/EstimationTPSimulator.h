@@ -15,20 +15,30 @@
 using namespace std;
 
 template<typename T, typename StateVector, typename SystemMatrix>
-void generateData(StateVector initial, function<SystemMatrix(T)> FGenerator, pair<T,T> timeInterval, T Ts, vector<pair<T,T>> turnRates, string filename) {
-  ofstream outputFile;
+void generateData(StateVector initial, function<SystemMatrix(T)> FGenerator, pair<T,T> timeInterval, string filename) {
+
+  /*initialize time variables */
+  int time = 1;
   auto lengthOfTest = timeInterval.second - timeInterval.first;
-  int numberOfDataPoints = floor(lengthOfTest / Ts);
-  vector<StateVector> data(numberOfDataPoints);
+
+  /*initialize data vector and iterator*/
+  vector<StateVector> data(lengthOfTest);
   data[0] = initial;
-  outputFile.open(filename);
   auto it = data.begin();
   it++;
+
+  /*open the file */
+  ofstream outputFile;
+  outputFile.open(filename);
+
+  /*generate the data*/
   for(it; it!= data.end(); it++) {
-    auto vec = *--it;//pre-decrement is essential
+    auto vec = *--it;//pre-decrement, not post-decrement
     it++;//set the iterator back to its original value;
+    SystemMatrix F(FGenerator(time));
     *it = (F * vec);//advance the system
-    outputFile<<vec(0)<<","<<vec(1)<<","<<vec(2)<<endl;//put the data in the file
+    outputFile<<vec(0)<<","<<vec(1)<<","<<vec(2)<<","<<vec(3)<<endl;//put the data in the file
+    time++;//increment the seconds counter;
   }
   outputFile.close();
 };

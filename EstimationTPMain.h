@@ -6,6 +6,7 @@
 #define ESTIMATION_PROJECT_2016_ESTIMATIONTPMAIN_H
 
 #include <iostream>
+#include <functional>
 
 #include "include/EstimationTPSimulator.h"
 #include "include/EstimationTPTypeDefinitions.h"
