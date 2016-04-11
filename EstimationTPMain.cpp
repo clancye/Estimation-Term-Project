@@ -14,12 +14,20 @@ int main() {
   pair<dataType ,dataType > interval(0.0,500);
   dataType samplingTime = 10;
   vector<pair<dataType ,dataType >> turnRates;
-  turnRates.push_back(make_pair(100, 2));
-  turnRates.push_back(make_pair(130, 0));
-  turnRates.push_back(make_pair(200, -1));
-  turnRates.push_back(make_pair(245, 1));
-  turnRates.push_back(make_pair(335, -1));
-  turnRates.push_back(make_pair(380, 0));
+  turnRates.push_back(make_pair(0,0));
+  turnRates.push_back(make_pair(100,2));
+  turnRates.push_back(make_pair(130,0));
+  turnRates.push_back(make_pair(200,-1));
+  turnRates.push_back(make_pair(245,1));
+  turnRates.push_back(make_pair(335,-1));
+  turnRates.push_back(make_pair(380,0));
+  int turnRateCounter = 0;
+  auto FGenerator = [=](double time) {
+    if(time > turnRates[turnRateCounter+1].first) {
+      turnRateCounter++;
+    }
+    double Omega = turnRates[turnRateCounter].second;
+  }
   generateData(initial, F, interval, samplingTime, turnRates,filename);
 
   return 0;
