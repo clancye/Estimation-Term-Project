@@ -10,5 +10,6 @@
 
 #include "include/EstimationTPSimulator.h"
 #include "include/EstimationTPTypeDefinitions.h"
+#include "include/KalmanFilter.h"
 
 #endif //ESTIMATION_PROJECT_2016_ESTIMATIONTPMAIN_H

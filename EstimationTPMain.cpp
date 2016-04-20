@@ -2,8 +2,8 @@
 
 using namespace std;
 
-vector<pair<dataType ,dataType >> GenerateTurnRates() {
-  vector<pair<dataType ,dataType >> someTurnRates;
+vector<pair<DataType ,DataType >> GenerateTurnRates() {
+  vector<pair<DataType ,DataType >> someTurnRates;
   someTurnRates.push_back(make_pair(0,0));//start off straight
   someTurnRates.push_back(make_pair(100,2));//at 100s, turn left 2deg/sec
   someTurnRates.push_back(make_pair(130,0));//at 130s, continue straight
@@ -20,8 +20,8 @@ int main() {
   cout << "Generating data in file " << filename<<endl;
   StateVector initial;
   initial <<0,0,0,250,0;
-  pair<dataType ,dataType > interval(0.0,500);
-  dataType samplingTime = 10;
+  pair<DataType ,DataType > interval(0.0,500);
+  DataType samplingTime = 10;
 
   /*Make a vector describing how the turn rate changes*/
   auto turnRates = GenerateTurnRates();
@@ -53,6 +53,29 @@ int main() {
 
   /*Generate the data*/
   //generateData(initial, function<SystemMatrix(timeType)>(FGenerator), interval, filename);
+
+  /* Kalman Filter Stuff*/
+  function<SystemMatrix()> _systemMatrixGenerator = []() {
+    SystemMatrix F;
+    return F;
+  };
+  function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
+    MeasurementMatrix H;
+    return H;
+  };
+  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = []() {
+    ProcessNoiseCovarianceMatrix Q;
+    return Q;
+  };
+  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
+    MeasurementCovarianceMatrix R;
+    return R;
+  };
+
+  KalmanFilter myKalmanFilter(_systemMatrixGenerator,
+  _measurementMatrixGenerator,
+  _processNoiseCovarianceGenerator,
+  _measurementCovarianceGenerator);
 
   return 0;
 }

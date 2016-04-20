@@ -9,27 +9,27 @@
 
 #include <utility>
 #include <vector>
+#include <functional>
 
 using namespace std;
 
 class KalmanFilter {
   TimeType _t;//time
 
-  StateVector _x;//current estimate
-  auto _z;//current measurement estimate
-  auto _v;//innovation
+  StateVector _x;//state estimate
+  MeasurementVector _z, _v;// measurement estimate, and residual
   StateCovarianceMatrix _P;//covariance matrix
-  auto _W;//gain matrix
-  auto _F;//system matrix
-  auto _Q;//noise covariance
-  auto _R;//measurement covariance
-  auto _H;//measurement matrix
-  auto _S;//measurement prediction covariance
+  GainMatrix _W;//gain matrix
+  SystemMatrix _F;//system matrix
+  ProcessNoiseCovarianceMatrix _Q;//noise covariance
+  MeasurementCovarianceMatrix _R;//measurement covariance
+  MeasurementMatrix _H;//measurement matrix
+  MeasurementPredictionCovarianceMatrix _S;//measurement prediction covariance
 
-  auto _systemMatrixGenerator;
-  auto _measurementMatrixGenerator;
-  auto _processNoiseCovarianceGenerator;
-  auto _measurementCovarianceGenerator;
+  function<SystemMatrix()> _systemMatrixGenerator;
+  function<MeasurementMatrix()> _measurementMatrixGenerator;
+  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator;
+  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator;
 
   vector<pair<StateVector,StateCovarianceMatrix>>  _predictions;
 
@@ -40,7 +40,7 @@ class KalmanFilter {
     _P = _P - _W*_S*_W.transpose();
   }
 
-  void UpdateStateEstimate(StateVector z) {
+  void UpdateStateEstimate(MeasurementVector z) {
     _x = _F*_x;
     _z = _H*_x;
     _v = z - _z;//actual measurement less predicted
@@ -62,7 +62,7 @@ class KalmanFilter {
     _P = initialCovariance;
   }
 
-  pair<StateVector,StateCovarianceMatrix> Update(StateVector measurement) {
+  pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement) {
     _F = _systemMatrixGenerator();//system matrix
     _Q = _processNoiseCovarianceGenerator();//process noise covariance
     _R = _measurementCovarianceGenerator();//measurement noise covariance

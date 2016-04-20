@@ -10,19 +10,22 @@
 
 using namespace Eigen;
 
-const int NUM_FILTERS = 2;
-const int NUM_STATES = 5;
-const int NUM_MEASUREMENTS = 2;
-const int NUM_PROCESS_NOISES = 3;
+#define NUM_FILTERS  2
+#define  NUM_STATES  5
+#define  NUM_MEASUREMENTS  2
+#define  NUM_PROCESS_NOISES  3
 
-typedef double dataType;
+typedef double DataType;
 typedef double TimeType;
-typedef Matrix<dataType, NUM_STATES,1> StateVector;
-typedef Matrix<dataType, NUM_STATES,NUM_STATES> SystemMatrix;
-typedef Matrix<dataType, NUM_STATES,NUM_STATES> StateCovarianceMatrix;
-typedef Matrix<dataType, NUM_STATES,NUM_STATES> ProcessNoiseCovarianceMatrix;
-typedef Matrix<dataType, NUM_MEASUREMENTS,NUM_STATES> MeasurementMatrix;
-typedef Matrix<dataType, NUM_MEASUREMENTS,NUM_MEASUREMENTS> MeasurementCovarianceMatrix;
+typedef Matrix<DataType, NUM_STATES,1> StateVector;
+typedef Matrix<DataType, NUM_MEASUREMENTS,1> MeasurementVector;
+typedef Matrix<DataType, NUM_STATES,NUM_STATES> SystemMatrix;
+typedef Matrix<DataType, NUM_STATES,NUM_STATES> StateCovarianceMatrix;
+typedef Matrix<DataType, NUM_STATES,NUM_STATES> ProcessNoiseCovarianceMatrix;
+typedef Matrix<DataType, NUM_MEASUREMENTS,NUM_STATES> MeasurementMatrix;
+typedef Matrix<DataType, NUM_MEASUREMENTS,NUM_MEASUREMENTS> MeasurementCovarianceMatrix;
+typedef Matrix<DataType, NUM_MEASUREMENTS,NUM_MEASUREMENTS> MeasurementPredictionCovarianceMatrix;
+typedef Matrix<DataType, NUM_STATES, NUM_MEASUREMENTS> GainMatrix;
 
 
 
