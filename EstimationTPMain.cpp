@@ -57,18 +57,43 @@ int main() {
   /* Kalman Filter Stuff*/
   function<SystemMatrix()> _systemMatrixGenerator = []() {
     SystemMatrix F;
+    F << 1, 1, 0, 0, 0,
+         0, 1, 0, 0, 0,
+         0, 0, 1, 1, 0,
+         0, 0, 0, 1, 0,
+         0, 0, 0, 0, 1;
     return F;
   };
   function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
     MeasurementMatrix H;
+    H <<
+    1, 0, 0, 0, 0,
+    0, 0, 1, 0, 0;
     return H;
   };
   function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = []() {
     ProcessNoiseCovarianceMatrix Q;
+    NoiseGainMatrix Gamma;
+    VProcessNoiseGainMatrix V;
+    Gamma <<
+      0.5*1*1, 0, 0,
+      1, 0, 0,
+      0, 0.5*1*1, 0,
+      0, 1, 0,
+      0, 0, 1;
+
+    V <<
+      .1, 0, 0,
+      0, .1, 0,
+      0, 0, 0;
+
+    Q = Gamma*V*Gamma.transpose();
     return Q;
   };
   function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
     MeasurementCovarianceMatrix R;
+    R<<1,0,
+       0,1;
     return R;
   };
 
@@ -78,10 +103,17 @@ int main() {
   _measurementCovarianceGenerator);
 
   StateVector a;
+  a<<0,0,0,250,0;
   StateCovarianceMatrix p;
+  p<<1,0,0,0,0,
+     0,1,0,0,0,
+     0,0,1,0,0,
+     0,0,0,1,0,
+     0,0,0,0,1;
   myKalmanFilter.Initialize(a,p);
   MeasurementVector z;
-  myKalmanFilter.Update(z);
+  auto myPair = myKalmanFilter.Update(z);
+  cout<<myPair.first<<endl;
 
   return 0;
 }

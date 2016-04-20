@@ -26,6 +26,8 @@ typedef Matrix<DataType, NUM_MEASUREMENTS,NUM_STATES> MeasurementMatrix;
 typedef Matrix<DataType, NUM_MEASUREMENTS,NUM_MEASUREMENTS> MeasurementCovarianceMatrix;
 typedef Matrix<DataType, NUM_MEASUREMENTS,NUM_MEASUREMENTS> MeasurementPredictionCovarianceMatrix;
 typedef Matrix<DataType, NUM_STATES, NUM_MEASUREMENTS> GainMatrix;
+typedef Matrix<DataType, NUM_STATES,NUM_PROCESS_NOISES> NoiseGainMatrix;
+typedef Matrix<DataType, NUM_PROCESS_NOISES,NUM_PROCESS_NOISES> VProcessNoiseGainMatrix;
 
 
 
