@@ -7,5 +7,6 @@ set(SOURCE_FILES
         EstimationTPMain.cpp EstimationTPMain.h
         include/EstimationTPSimulator.h
         include/EstimationTPTypeDefinitions.h
-        include/KalmanFilter.h)
+        include/KalmanFilter.h
+        src/Target.cpp include/Target.h)
 add_executable(Estimation_Project_2016 ${SOURCE_FILES})

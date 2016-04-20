@@ -99,5 +99,11 @@ int main() {
   auto myPair = myKalmanFilter.Update(z);
   cout<<myPair.first<<endl;
 
+  Target myTarget("My Target",filename);
+  myTarget.Advance(6);
+  StateVector x = myTarget.Sample();
+  cout<<x;
+
+
   return 0;
 }
