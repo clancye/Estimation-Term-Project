@@ -28,7 +28,7 @@ int main() {
   int turnRateCounter = 0;
 
   /*Make a lambda that generates the system matrix */
-  auto FGenerator = [=](timeType t) mutable {
+  auto FGenerator = [=](TimeType t) mutable {
     if(t >= turnRates[turnRateCounter+1].first) {
       turnRateCounter++;
     }

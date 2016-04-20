@@ -5,6 +5,8 @@
 #ifndef ESTIMATION_PROJECT_2016_KALMANFILTER_H
 #define ESTIMATION_PROJECT_2016_KALMANFILTER_H
 
+#include "EstimationTPTypeDefinitions.h"
+
 #include <utility>
 #include <vector>
 
@@ -13,10 +15,10 @@ using namespace std;
 class KalmanFilter {
   TimeType _t;//time
 
-  auto _x;//current estimate
+  StateVector _x;//current estimate
   auto _z;//current measurement estimate
   auto _v;//innovation
-  auto _P;//covariance matrix
+  StateCovarianceMatrix _P;//covariance matrix
   auto _W;//gain matrix
   auto _F;//system matrix
   auto _Q;//noise covariance
@@ -29,7 +31,7 @@ class KalmanFilter {
   auto _processNoiseCovarianceGenerator;
   auto _measurementCovarianceGenerator;
 
-  vector<pair<StateVector,StateCovariance>>  _predictions;
+  vector<pair<StateVector,StateCovarianceMatrix>>  _predictions;
 
   void UpdateCovarianceAndGain() {
     _P = _F*_P*_F.transpose()+_Q;
@@ -50,8 +52,6 @@ class KalmanFilter {
                function<MeasurementMatrix()> measurementMatrixGenerator,
                function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
                function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator):
-          _x(initialState),
-          _P(initialCovariance),
           _systemMatrixGenerator(systemMatrixGenerator),
           _measurementMatrixGenerator(measurementMatrixGenerator),
           _processNoiseCovarianceGenerator(processNoiseCovarianceGenerator),
@@ -69,7 +69,7 @@ class KalmanFilter {
     _H = _measurementMatrixGenerator();//measurement matrix
     UpdateCovarianceAndGain();
     UpdateStateEstimate(measurement);
-    auto estimates = make_pair(_x,_P);
+    pair<StateVector, StateCovarianceMatrix> estimates = make_pair(_x,_P);
     _predictions.push_back(estimates);
     return estimates;
   }

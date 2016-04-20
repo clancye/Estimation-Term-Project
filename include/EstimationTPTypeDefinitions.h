@@ -16,7 +16,7 @@ const int NUM_MEASUREMENTS = 2;
 const int NUM_PROCESS_NOISES = 3;
 
 typedef double dataType;
-typedef double timeType;
+typedef double TimeType;
 typedef Matrix<dataType, NUM_STATES,1> StateVector;
 typedef Matrix<dataType, NUM_STATES,NUM_STATES> SystemMatrix;
 typedef Matrix<dataType, NUM_STATES,NUM_STATES> StateCovarianceMatrix;
