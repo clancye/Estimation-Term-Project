@@ -37,7 +37,11 @@ void generateData(StateVector initial, function<SystemMatrix(T)> FGenerator, pai
     it++;//set the iterator back to its original value;
     SystemMatrix F(FGenerator(time));
     *it = (F * vec);//advance the system
-    outputFile<<vec(0)<<","<<vec(1)<<","<<vec(2)<<","<<vec(3)<<endl;//put the data in the file
+    for(int i = 0;i<vec.size();i++) {
+      outputFile << vec(i);
+      if(i!= vec.size()-1) outputFile << ",";
+    }
+    outputFile<<endl;
     time++;//increment the seconds counter;
   }
   outputFile.close();

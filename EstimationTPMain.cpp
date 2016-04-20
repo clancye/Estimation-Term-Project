@@ -4,7 +4,7 @@ using namespace std;
 
 vector<pair<DataType ,DataType >> GenerateTurnRates() {
   vector<pair<DataType ,DataType >> someTurnRates;
-  someTurnRates.push_back(make_pair(0,0));//start off straight
+  /*someTurnRates.push_back(make_pair(0,0));//start off straight
   someTurnRates.push_back(make_pair(100,2));//at 100s, turn left 2deg/sec
   someTurnRates.push_back(make_pair(130,0));//at 130s, continue straight
   someTurnRates.push_back(make_pair(200,-1));//at 200s, turn right 1deg/sec
@@ -12,16 +12,22 @@ vector<pair<DataType ,DataType >> GenerateTurnRates() {
   someTurnRates.push_back(make_pair(335,-1));//at 335s, turn right 1deg/sec
   someTurnRates.push_back(make_pair(380,0));//at 380s, continue straight
   someTurnRates.push_back(make_pair(500,0));//repeating to satisfy loop condition below
+   */
+  someTurnRates.push_back(make_pair(0,0));
+  someTurnRates.push_back(make_pair(100,0));
   return someTurnRates;
 };
 
 int main() {
-  string filename = "/home/clancy/Projects/Estimation Project 2016/test.txt";
+  string filename = "/home/clancy/Projects/Estimation Project 2016/page218Example.txt";
   cout << "Generating data in file " << filename<<endl;
   StateVector initial;
-  initial <<0,0,0,250,0;
-  pair<DataType ,DataType > interval(0.0,500);
-  DataType samplingTime = 10;
+  initial <<0,10;
+  StateCovarianceMatrix p;
+  p<<1,0,
+     0,1;
+  pair<DataType ,DataType > interval(0.0,100);
+  DataType Ts = 1;
 
   /*Make a vector describing how the turn rate changes*/
   auto turnRates = GenerateTurnRates();
@@ -42,58 +48,43 @@ int main() {
               0, 0, 0, 0, 1;
     }
     else {
-      F << 1, 1, 0, 0, 0,
-           0, 1, 0, 0, 0,
-           0, 0, 1, 1, 0,
-           0, 0, 0, 1, 0,
-           0, 0, 0, 0, 1;
+      F << 1, Ts,
+           0, 1;
     }
     return F;
   };
 
   /*Generate the data*/
-  //generateData(initial, function<SystemMatrix(timeType)>(FGenerator), interval, filename);
+  generateData(initial, function<SystemMatrix(TimeType)>(FGenerator), interval, filename);
 
   /* Kalman Filter Stuff*/
-  function<SystemMatrix()> _systemMatrixGenerator = []() {
+  function<SystemMatrix()> _systemMatrixGenerator = [=]() {
     SystemMatrix F;
-    F << 1, 1, 0, 0, 0,
-         0, 1, 0, 0, 0,
-         0, 0, 1, 1, 0,
-         0, 0, 0, 1, 0,
-         0, 0, 0, 0, 1;
+    F << 1, Ts,
+         0, 1;
     return F;
   };
   function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
     MeasurementMatrix H;
-    H <<
-    1, 0, 0, 0, 0,
-    0, 0, 1, 0, 0;
+    H << 1, 0;
     return H;
   };
-  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = []() {
+  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = [=]() {
     ProcessNoiseCovarianceMatrix Q;
     NoiseGainMatrix Gamma;
     VProcessNoiseGainMatrix V;
     Gamma <<
-      0.5*1*1, 0, 0,
-      1, 0, 0,
-      0, 0.5*1*1, 0,
-      0, 1, 0,
-      0, 0, 1;
+      0.5*Ts*Ts,
+      Ts;
 
-    V <<
-      .1, 0, 0,
-      0, .1, 0,
-      0, 0, 0;
+    V << 0;
 
     Q = Gamma*V*Gamma.transpose();
     return Q;
   };
   function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
     MeasurementCovarianceMatrix R;
-    R<<1,0,
-       0,1;
+    R<<1;
     return R;
   };
 
@@ -102,15 +93,8 @@ int main() {
   _processNoiseCovarianceGenerator,
   _measurementCovarianceGenerator);
 
-  StateVector a;
-  a<<0,0,0,250,0;
-  StateCovarianceMatrix p;
-  p<<1,0,0,0,0,
-     0,1,0,0,0,
-     0,0,1,0,0,
-     0,0,0,1,0,
-     0,0,0,0,1;
-  myKalmanFilter.Initialize(a,p);
+
+  myKalmanFilter.Initialize(initial,p);
   MeasurementVector z;
   auto myPair = myKalmanFilter.Update(z);
   cout<<myPair.first<<endl;
