@@ -10,10 +10,19 @@
 
 using namespace Eigen;
 
+const int NUM_FILTERS = 2;
+const int NUM_STATES = 5;
+const int NUM_MEASUREMENTS = 2;
+const int NUM_PROCESS_NOISES = 3;
+
 typedef double dataType;
 typedef double timeType;
-typedef Matrix<dataType, 4,1> StateVector;
-typedef Matrix<dataType, 4,4> SystemMatrix;
+typedef Matrix<dataType, NUM_STATES,1> StateVector;
+typedef Matrix<dataType, NUM_STATES,NUM_STATES> SystemMatrix;
+typedef Matrix<dataType, NUM_STATES,NUM_STATES> StateCovarianceMatrix;
+typedef Matrix<dataType, NUM_STATES,NUM_STATES> ProcessNoiseCovarianceMatrix;
+typedef Matrix<dataType, NUM_MEASUREMENTS,NUM_STATES> MeasurementMatrix;
+typedef Matrix<dataType, NUM_MEASUREMENTS,NUM_MEASUREMENTS> MeasurementCovarianceMatrix;
 
 
 

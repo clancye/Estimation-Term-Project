@@ -6,14 +6,12 @@
 #define ESTIMATION_PROJECT_2016_KALMANFILTER_H
 
 #include <utility>
+#include <vector>
+
+using namespace std;
 
 class KalmanFilter {
-  TimeType _currentTime;
-  auto _systemMatrixGenerator;
-  auto _measurementMatrixGenerator;
-  auto _processNoiseCovarianceGenerator;
-  auto _controlGainGenerator;
-  auto _measurementCovarianceGenerator;
+  TimeType _t;//time
 
   auto _x;//current estimate
   auto _z;//current measurement estimate
@@ -26,7 +24,12 @@ class KalmanFilter {
   auto _H;//measurement matrix
   auto _S;//measurement prediction covariance
 
-  vector<pair<StateVector,StateCovariance>  _predictions;
+  auto _systemMatrixGenerator;
+  auto _measurementMatrixGenerator;
+  auto _processNoiseCovarianceGenerator;
+  auto _measurementCovarianceGenerator;
+
+  vector<pair<StateVector,StateCovariance>>  _predictions;
 
   void UpdateCovarianceAndGain() {
     _P = _F*_P*_F.transpose()+_Q;
@@ -43,17 +46,15 @@ class KalmanFilter {
   }
   public:
   KalmanFilter(){}
-  KalmanFilter(function<SystemMatrix(TimeType)> systemMatrixGenerator,
-               function<MeasurementMatrix(TimeType)> measurementMatrixGenerator,
-               function<ProcessNoiseCovarianceMatrix(TimeType)> processNoiseCovarianceGenerator,
-               function<ControlGainMatrix(TimeType)> controlGainGenerator,
-               function<MeasurementCovarianceMatrix(TimeType)> measurementCovarianceGenerator):
+  KalmanFilter(function<SystemMatrix()> systemMatrixGenerator,
+               function<MeasurementMatrix()> measurementMatrixGenerator,
+               function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
+               function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator):
           _x(initialState),
           _P(initialCovariance),
           _systemMatrixGenerator(systemMatrixGenerator),
           _measurementMatrixGenerator(measurementMatrixGenerator),
           _processNoiseCovarianceGenerator(processNoiseCovarianceGenerator),
-          _controlGainGenerator(controlGainGenerator),
           _measurementCovarianceGenerator(measurementCovarianceGenerator) { }
 
   void Initialize(StateVector initialState, StateCovarianceMatrix initialCovariance) {
@@ -66,7 +67,7 @@ class KalmanFilter {
     _Q = _processNoiseCovarianceGenerator();//process noise covariance
     _R = _measurementCovarianceGenerator();//measurement noise covariance
     _H = _measurementMatrixGenerator();//measurement matrix
-    UpdateCovarianceAndGain(_currentTime);
+    UpdateCovarianceAndGain();
     UpdateStateEstimate(measurement);
     auto estimates = make_pair(_x,_P);
     _predictions.push_back(estimates);
