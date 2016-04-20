@@ -45,7 +45,7 @@ int main() {
   };
 
   /*Generate the data*/
-  generateData(initial, function<SystemMatrix(timeType)>(FGenerator), interval, filename);
+  //generateData(initial, function<SystemMatrix(timeType)>(FGenerator), interval, filename);
 
   return 0;
 }
