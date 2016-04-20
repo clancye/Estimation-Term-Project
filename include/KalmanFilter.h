@@ -24,7 +24,7 @@ class KalmanFilter {
   ProcessNoiseCovarianceMatrix _Q;//noise covariance
   MeasurementCovarianceMatrix _R;//measurement covariance
   MeasurementMatrix _H;//measurement matrix
-  MeasurementPredictionCovarianceMatrix _S;//measurement prediction covariance
+  MeasurementCovarianceMatrix _S;//measurement prediction covariance
 
   function<SystemMatrix()> _systemMatrixGenerator;
   function<MeasurementMatrix()> _measurementMatrixGenerator;
@@ -35,7 +35,7 @@ class KalmanFilter {
 
   void UpdateCovarianceAndGain() {
     _P = _F*_P*_F.transpose()+_Q;
-    _S = _R + _H*_P*_H.transpose();//measurement prediction covariance
+    _S = _R + _H*_P*_H.transpose();//measurement prediction covarianc
     _W = _P*_H.transpose()*_S.inverse();//gain matrix
     _P = _P - _W*_S*_W.transpose();
   }

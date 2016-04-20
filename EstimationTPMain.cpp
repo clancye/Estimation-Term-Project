@@ -77,5 +77,11 @@ int main() {
   _processNoiseCovarianceGenerator,
   _measurementCovarianceGenerator);
 
+  StateVector a;
+  StateCovarianceMatrix p;
+  myKalmanFilter.Initialize(a,p);
+  MeasurementVector z;
+  myKalmanFilter.Update(z);
+
   return 0;
 }
