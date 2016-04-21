@@ -19,26 +19,29 @@ vector<pair<DataType ,DataType >> GenerateTurnRates() {
 };
 
 int main() {
-  string filename = "/home/clancy/Projects/Estimation Project 2016/page218Example.txt";
+  string filename = "/home/clancy/Projects/Estimation Project 2016/test.txt";
   cout << "Generating data in file " << filename<<endl;
-  StateVector initial;
-  initial <<0,10;
-  StateCovarianceMatrix p;
-  p<<1,0,
-     0,1;
-  pair<DataType ,DataType > interval(0.0,100);
+  string configID("term project");
+  EstimationTPDataGenerator generator(configID,filename);
+  //StateVector initial;
+  //initial <<0,10;
+
+ // StateCovarianceMatrix p;
+ // p<<1,0,
+ //    0,1;
+ // pair<DataType ,DataType > interval(0.0,100);
   DataType Ts = 1;
 
-  /*Make a vector describing how the turn rate changes*/
-  auto turnRates = GenerateTurnRates();
+  /*Make a vector describing how the turn rate changes
+  /*auto turnRates = GenerateTurnRates();
   int turnRateCounter = 0;
 
-  /*Make a lambda that generates the system matrix */
+  /*Make a lambda that generates the system matrix
   auto FGenerator = [=](TimeType t) mutable {
     if(t >= turnRates[turnRateCounter+1].first) {
       turnRateCounter++;
     }
-    double Omega = 3.14159265358979*turnRates[turnRateCounter].second/180;
+    double Omega = 3.14159265358979*turnRates[turnRateCounter].second/180;//convert to rads
     SystemMatrix F;
     if(Omega != 0) {
       F << 1, sin(Omega) / Omega, 0, -(1 - cos(Omega)) / Omega, 0,
@@ -54,10 +57,10 @@ int main() {
     return F;
   };
 
-  /*Generate the data*/
-  generateData(initial, function<SystemMatrix(TimeType)>(FGenerator), interval, filename);
+  /*Generate the data
+  generateData(initial, function<SystemMatrix(TimeType)>(FGenerator), interval, filename);*/
 
-  /* Kalman Filter Stuff*/
+  /* Kalman Filter Stuff
   function<SystemMatrix()> _systemMatrixGenerator = [=]() {
     SystemMatrix F;
     F << 1, Ts,
@@ -102,7 +105,7 @@ int main() {
   Target myTarget("My Target",filename);
   myTarget.Advance(6);
   StateVector x = myTarget.Sample();
-  cout<<x;
+  cout<<x;*/
 
 
   return 0;

@@ -14,5 +14,6 @@
 #include "include/EstimationTPTypeDefinitions.h"
 #include "include/KalmanFilter.h"
 #include "include/Target.h"
+#include "include/EstimationTPDataGenerator.h"
 
 #endif //ESTIMATION_PROJECT_2016_ESTIMATIONTPMAIN_H
