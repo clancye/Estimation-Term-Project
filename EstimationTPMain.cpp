@@ -2,63 +2,15 @@
 
 using namespace std;
 
-vector<pair<DataType ,DataType >> GenerateTurnRates() {
-  vector<pair<DataType ,DataType >> someTurnRates;
-  /*someTurnRates.push_back(make_pair(0,0));//start off straight
-  someTurnRates.push_back(make_pair(100,2));//at 100s, turn left 2deg/sec
-  someTurnRates.push_back(make_pair(130,0));//at 130s, continue straight
-  someTurnRates.push_back(make_pair(200,-1));//at 200s, turn right 1deg/sec
-  someTurnRates.push_back(make_pair(245,1));//at 245s, turn left 1deg/sec
-  someTurnRates.push_back(make_pair(335,-1));//at 335s, turn right 1deg/sec
-  someTurnRates.push_back(make_pair(380,0));//at 380s, continue straight
-  someTurnRates.push_back(make_pair(500,0));//repeating to satisfy loop condition below
-   */
-  someTurnRates.push_back(make_pair(0,0));
-  someTurnRates.push_back(make_pair(100,0));
-  return someTurnRates;
-};
-
 int main() {
-  string filename = "/home/clancy/Projects/Estimation Project 2016/test.txt";
+  string filename = "/home/clancy/Projects/Estimation Project 2016/NEWTEST.txt";
   cout << "Generating data in file " << filename<<endl;
   string configID("term project");
   EstimationTPDataGenerator generator(configID,filename);
-  //StateVector initial;
-  //initial <<0,10;
 
- // StateCovarianceMatrix p;
- // p<<1,0,
- //    0,1;
- // pair<DataType ,DataType > interval(0.0,100);
+
   DataType Ts = 1;
 
-  /*Make a vector describing how the turn rate changes
-  /*auto turnRates = GenerateTurnRates();
-  int turnRateCounter = 0;
-
-  /*Make a lambda that generates the system matrix
-  auto FGenerator = [=](TimeType t) mutable {
-    if(t >= turnRates[turnRateCounter+1].first) {
-      turnRateCounter++;
-    }
-    double Omega = 3.14159265358979*turnRates[turnRateCounter].second/180;//convert to rads
-    SystemMatrix F;
-    if(Omega != 0) {
-      F << 1, sin(Omega) / Omega, 0, -(1 - cos(Omega)) / Omega, 0,
-              0, cos(Omega), 0, -sin(Omega), 0,
-              0, (1 - cos(Omega)) / Omega, 1, sin(Omega) / Omega, 0,
-              0, sin(Omega), 0, cos(Omega), 0,
-              0, 0, 0, 0, 1;
-    }
-    else {
-      F << 1, Ts,
-           0, 1;
-    }
-    return F;
-  };
-
-  /*Generate the data
-  generateData(initial, function<SystemMatrix(TimeType)>(FGenerator), interval, filename);*/
 
   /* Kalman Filter Stuff
   function<SystemMatrix()> _systemMatrixGenerator = [=]() {
