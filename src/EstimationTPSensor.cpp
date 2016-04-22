@@ -4,8 +4,8 @@
 
 #include "../include/EstimationTPSensor.h"
 
-list<double> EstimationTPSensor::Measure(Target& aTarget) {
-  list<double> measurements;
+vector<double> EstimationTPSensor::Measure(Target& aTarget) {
+  vector<double> measurements;
   StateVector sample = aTarget.Sample();
   for_each(_functions.begin(),_functions.end(), [&](function<double(StateVector,StateVector)> fun) {
     measurements.push_back(fun(_location,sample));

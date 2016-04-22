@@ -2,18 +2,20 @@
 
 using namespace std;
 
-list<function<double(StateVector,StateVector)>> getMeasurementFunctions() {
-  list<function<double(StateVector, StateVector)>> functions;
+vector<function<double(StateVector,StateVector)>> getMeasurementFunctions() {
+  vector<function<double(StateVector, StateVector)>> functions;
   random_device random_device1, random_device2;
   mt19937 rangeNoiseGenerator(random_device1()), angleNoiseGenerator(random_device2());
-  normal_distribution<double> rangeNoise(0, 50), angleNoise(0, .01745);//page 488, angle in rads
+  //normal_distribution<double> rangeNoise(0, 50), angleNoise(0, .01745);//page 488, angle in rads
+  normal_distribution<double> rangeNoise(0, 1), angleNoise(0, .01745);//page 218, angle doesn't matter
   auto Range = function<double(StateVector, StateVector)>(
           [rangeNoise, rangeNoiseGenerator]
                   (StateVector sensorState, StateVector targetState) mutable {
             double range = 0;
             int size = sensorState.size();
             for (int i = 0; i < size; i++) {
-              range += pow(sensorState(i) - targetState(i), 2);
+              if(i%2==0)//filter out the velocity state variables
+                range += pow(sensorState(i) - targetState(i), 2);
             }
             range = sqrt(range);
             range += rangeNoise(rangeNoiseGenerator);
@@ -36,10 +38,20 @@ list<function<double(StateVector,StateVector)>> getMeasurementFunctions() {
 }
 
 int main() {
-  string filename = "/home/clancy/Projects/Estimation Project 2016/Term Project Data.txt";
+  cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl;
+  string dataset,filename;
+  cin >> dataset;
+  if(dataset == "1") {
+    filename = "/home/clancy/Projects/Estimation Project 2016/Term Project Data.txt";
+    string configID("term project");//check DataGenerator.h for correct config IDs
+  }
+  else if(dataset == "2") {
+    filename = "/home/clancy/Projects/Estimation Project 2016/page218Example.txt";
+    string configID("pg218 example");//check DataGenerator.h for correct config IDs
+  }
+
   /*Uncomment below to generate data */
   /*cout << "Generating data in file " << filename<<endl;
-  string configID("term project");
   EstimationTPDataGenerator generator(configID,filename);*/
 
 
@@ -50,7 +62,7 @@ int main() {
   if(sensorState.size()==5)
     sensorState << -10000,0,0,0,0;//for term project
   else
-    sensorState<< 0,10;//for example code
+    sensorState<< 0,0;//for example from page 218
 
   auto measurementFunctions = getMeasurementFunctions();
 
@@ -58,7 +70,7 @@ int main() {
 
 
 
-  /* Kalman Filter Stuff
+  /* Kalman Filter Stuff*/
   function<SystemMatrix()> _systemMatrixGenerator = [=]() {
     SystemMatrix F;
     F << 1, Ts,
@@ -85,7 +97,7 @@ int main() {
   };
   function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
     MeasurementCovarianceMatrix R;
-    R<<1;
+    R<<1;//variance/standard deviation for page 218
     return R;
   };
 
@@ -94,14 +106,19 @@ int main() {
   _processNoiseCovarianceGenerator,
   _measurementCovarianceGenerator);
 
+  double m1;
+  for(int i = 0;i<5;i++) {
+    StateVector x = target.Sample();
+    m1 = sensor.Measure(target)[0];
+    cout << "x = "<<x<<endl<<"m1 = " << m1 << endl<<endl;
+    target.Advance();
+  }
 
-  myKalmanFilter.Initialize(initial,p);
-  MeasurementVector z;
-  auto myPair = myKalmanFilter.Update(z);
-  cout<<myPair.first<<endl;
+  //myKalmanFilter.Initialize(initial,p);
+  //MeasurementVector z;
+  //auto myPair = myKalmanFilter.Update(z);
+  //cout<<myPair.first<<endl;
 
-
-  cout<<x;*/
 
 
   return 0;

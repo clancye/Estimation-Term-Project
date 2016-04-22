@@ -8,21 +8,21 @@
 #include "EstimationTPTypeDefinitions.h"
 #include "Target.h"
 
-#include <list>
+#include <vector>
 #include <algorithm>
 
 using namespace std;
 
 class EstimationTPSensor {
   StateVector _location;
-  list<function<double(StateVector,StateVector)>> _functions;
+  vector<function<double(StateVector,StateVector)>> _functions;
 
   public:
   EstimationTPSensor() = delete;
-  EstimationTPSensor(StateVector location, list<function<double(StateVector,StateVector)>> functions):
+  EstimationTPSensor(StateVector location, vector<function<double(StateVector,StateVector)>> functions):
           _location(location),
           _functions(functions){}
-  list<double> Measure(Target& aTarget);
+  vector<double> Measure(Target& aTarget);
 };
 
 

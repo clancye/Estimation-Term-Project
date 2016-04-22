@@ -4,6 +4,16 @@
 
 #include "../include/Target.h"
 
+Target::Target(const string& name, string dataFile): _name(name), _dataFile(dataFile){
+  _data = ifstream(_dataFile);
+  Advance();
+}
+
+Target::Target(const string&& name, string dataFile): _name(move(name)), _dataFile(dataFile){
+  _data = ifstream(_dataFile);
+  Advance();
+}
+
 void Target::Print(const string&& message) {
   cout<<move(message)<<endl;
 }
@@ -13,7 +23,6 @@ void Target::Print(const string& message) {
 }
 
 void Target::Advance(int times) {
-  _data = ifstream(_dataFile);
   for(int i = 0;i<times;i++) {
     string nextStateString;
     StateVector nextStateVector;

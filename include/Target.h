@@ -19,8 +19,8 @@ class Target {
   StateVector _state;
   ifstream _data;
   public:
-  Target(const string& name, string dataFile): _name(name), _dataFile(dataFile){ }
-  Target(const string&& name, string dataFile): _name(move(name)), _dataFile(dataFile){ }
+  Target(const string& name, string dataFile);
+  Target(const string&& name, string dataFile);
   ~Target() {
     _data.close();
     Print("Deleting target \"" + _name + "\"");

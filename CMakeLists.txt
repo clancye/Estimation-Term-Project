@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(SOURCE_FILES
         EstimationTPMain.cpp EstimationTPMain.h
         include/EstimationTPTypeDefinitions.h
-        include/KalmanFilter.h
+        src/KalmanFilter.cpp include/KalmanFilter.h
         src/Target.cpp include/Target.h
         src/EstimationTPDataGenerator.cpp include/EstimationTPDataGenerator.h
         src/EstimationTPSensor.cpp include/EstimationTPSensor.h)
