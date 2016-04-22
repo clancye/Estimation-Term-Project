@@ -9,5 +9,7 @@ set(SOURCE_FILES
         src/KalmanFilter.cpp include/KalmanFilter.h
         src/Target.cpp include/Target.h
         src/EstimationTPDataGenerator.cpp include/EstimationTPDataGenerator.h
-        src/EstimationTPSensor.cpp include/EstimationTPSensor.h)
+        include/Sensor.h
+        src/RangeSensor.cpp include/RangeSensor.h
+        src/AzimuthSensor.cpp include/AzimuthSensor.h)
 add_executable(Estimation_Project_2016 ${SOURCE_FILES})

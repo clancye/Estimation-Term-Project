@@ -15,6 +15,7 @@
 #include "include/KalmanFilter.h"
 #include "include/Target.h"
 #include "include/EstimationTPDataGenerator.h"
-#include "include/EstimationTPSensor.h"
+#include "include/RangeSensor.h"
+#include "include/AzimuthSensor.h"
 
 #endif //ESTIMATION_PROJECT_2016_ESTIMATIONTPMAIN_H
