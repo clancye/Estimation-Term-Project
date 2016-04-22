@@ -6,7 +6,6 @@
 #define ESTIMATION_PROJECT_2016_ESTIMATIONTPTYPEDEFINITIONS_H
 
 #include </usr/include/eigen3/Eigen/Dense>
-#include <functional>
 
 using namespace Eigen;
 

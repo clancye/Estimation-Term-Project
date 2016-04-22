@@ -4,13 +4,33 @@ using namespace std;
 
 int main() {
   string filename = "/home/clancy/Projects/Estimation Project 2016/NEWTEST.txt";
-  cout << "Generating data in file " << filename<<endl;
+ /* cout << "Generating data in file " << filename<<endl;
   string configID("term project");
-  EstimationTPDataGenerator generator(configID,filename);
+  EstimationTPDataGenerator generator(configID,filename);*/
 
 
   DataType Ts = 1;
+  Target myTarget("My Target",filename);
+  myTarget.Advance(6);
+  StateVector x = myTarget.Sample();
 
+  random_device random_device1,random_device2;
+  mt19937 distanceNoiseGenerator(random_device1()), angleNoiseGenerator(random_device2());
+  normal_distribution<double> distanceNoise(0,50),angleNoise(0,.01745);//page 488, angle in rads
+  auto Distance = function<double(StateVector,StateVector)> (
+          [distanceNoise,distanceNoiseGenerator]
+          (StateVector sensorState, StateVector targetState) mutable {
+            double x0 = sensorState(0), x1 = targetState(0), y0  = sensorState(2), y1 = targetState(2),distance;
+            distance = sqrt(pow(x0-x1,2)+pow(y0-y1,2));
+            distance += distanceNoise(distanceNoiseGenerator);
+            return distance;
+  });
+
+  StateVector targetVec, sampleVec;
+  sampleVec<<1,0,0,0,0;
+  targetVec<<0,0,0,0,0;
+  cout<<Distance(sampleVec,targetVec)<<endl;
+  cout<<Distance(sampleVec,targetVec);
 
   /* Kalman Filter Stuff
   function<SystemMatrix()> _systemMatrixGenerator = [=]() {
@@ -54,9 +74,7 @@ int main() {
   auto myPair = myKalmanFilter.Update(z);
   cout<<myPair.first<<endl;
 
-  Target myTarget("My Target",filename);
-  myTarget.Advance(6);
-  StateVector x = myTarget.Sample();
+
   cout<<x;*/
 
 

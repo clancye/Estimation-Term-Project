@@ -9,11 +9,12 @@
 #include <iostream>
 #include <functional>
 #include <fstream>
+#include <random>
 
-#include "include/EstimationTPSimulator.h"
 #include "include/EstimationTPTypeDefinitions.h"
 #include "include/KalmanFilter.h"
 #include "include/Target.h"
 #include "include/EstimationTPDataGenerator.h"
+#include "include/EstimationTPSensor.h"
 
 #endif //ESTIMATION_PROJECT_2016_ESTIMATIONTPMAIN_H
