@@ -25,12 +25,19 @@ int main() {
             distance += distanceNoise(distanceNoiseGenerator);
             return distance;
   });
-
-  StateVector targetVec, sampleVec;
-  sampleVec<<1,0,0,0,0;
-  targetVec<<0,0,0,0,0;
-  cout<<Distance(sampleVec,targetVec)<<endl;
-  cout<<Distance(sampleVec,targetVec);
+  auto Azimuth = function<double(StateVector,StateVector)> (
+          [angleNoise,angleNoiseGenerator]
+          (StateVector sensorState, StateVector targetState) mutable {
+            double x0 = sensorState(0), x1 = targetState(0), y0  = sensorState(2), y1 = targetState(2),azimuth;
+            azimuth = atan2(y1-y0,x1-x0);
+            azimuth += angleNoise(angleNoiseGenerator);
+            return azimuth;
+  });
+  StateVector targetVec, sensorVec;
+  sensorVec<<1,0,0,0,0;
+  targetVec<<2,0,0,0,0;
+  cout<<Azimuth(sensorVec,targetVec)<<endl;
+  cout<<Azimuth(sensorVec,targetVec);
 
   /* Kalman Filter Stuff
   function<SystemMatrix()> _systemMatrixGenerator = [=]() {
