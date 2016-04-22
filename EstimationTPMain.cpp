@@ -36,8 +36,9 @@ list<function<double(StateVector,StateVector)>> getMeasurementFunctions() {
 }
 
 int main() {
-  string filename = "/home/clancy/Projects/Estimation Project 2016/NEWTEST.txt";
- /* cout << "Generating data in file " << filename<<endl;
+  string filename = "/home/clancy/Projects/Estimation Project 2016/Term Project Data.txt";
+  /*Uncomment below to generate data */
+  /*cout << "Generating data in file " << filename<<endl;
   string configID("term project");
   EstimationTPDataGenerator generator(configID,filename);*/
 
@@ -54,15 +55,7 @@ int main() {
   auto measurementFunctions = getMeasurementFunctions();
 
   EstimationTPSensor sensor(sensorState,measurementFunctions);
-  auto m1 = sensor.Measure(target);
-  for(auto x:m1)
-    cout<<x<<",";
-  cout<<endl;
-  target.Advance(160);
-  m1 = sensor.Measure(target);
-  for(auto x:m1)
-    cout<<x<<",";
-  cout<<endl;
+
 
 
   /* Kalman Filter Stuff

@@ -75,7 +75,7 @@ void EstimationTPDataGenerator::GenerateData(StateVector initial,
   auto lengthOfTest = timeInterval.second - timeInterval.first;
 
   /*initialize data vector and iterator*/
-  vector<StateVector> data(lengthOfTest);
+  vector<StateVector> data(lengthOfTest+1);
   data[0] = initial;
   auto it = data.begin();
   it++;
