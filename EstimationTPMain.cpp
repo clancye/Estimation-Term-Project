@@ -1,6 +1,52 @@
 #include "EstimationTPMain.h"
 
 using namespace std;
+KalmanFilter setupKalmanFilter() {
+  DataType Ts = 1;//sampling time
+  function<SystemMatrix()> _systemMatrixGenerator = [=]() {
+    SystemMatrix F;
+    F << 1, Ts, 0, 0, 0,
+            0, 1, 0, 0, 0,
+            0, 0, 1, Ts, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1;
+    return F;
+  };
+  function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
+    MeasurementMatrix H;
+    H << 1, 0, 0, 0, 0;
+    return H;
+  };
+  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = [=]() {
+    ProcessNoiseCovarianceMatrix Q;
+    NoiseGainMatrix Gamma;
+    VProcessNoiseGainMatrix V;
+    Gamma <<
+    0.5*Ts*Ts,
+            Ts,
+            0.5*Ts*Ts,
+            Ts,
+            Ts;
+
+    V << 0;
+
+    Q = Gamma*V*Gamma.transpose();
+    return Q;
+  };
+  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
+    MeasurementCovarianceMatrix R;
+    R<<1;//variance/standard deviation for page 218
+    return R;
+  };
+
+  KalmanFilter myKalmanFilter(Ts,
+                              _systemMatrixGenerator,
+                              _measurementMatrixGenerator,
+                              _processNoiseCovarianceGenerator,
+                              _measurementCovarianceGenerator);
+
+  return myKalmanFilter;
+}
 
 int main() {
   cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
@@ -24,7 +70,6 @@ int main() {
   EstimationTPDataGenerator generator(configID,filename);
 
   /*Make the target*/
-  DataType Ts = 1;//sampling time
   Target target(filename);//instantiate the target
 
   /*Make the sensors*/
@@ -37,44 +82,7 @@ int main() {
   RangeSensor range(sensorState,0,1);
 
   /* Instantiate the Kalman Filter*/
-  function<SystemMatrix()> _systemMatrixGenerator = [=]() {
-    SystemMatrix F;
-    F << 1, Ts, 0, 0, 0,
-         0, 1, 0, 0, 0,
-         0, 0, 1, Ts, 0,
-         0, 0, 0, 1, 0,
-         0, 0, 0, 0, 1;
-    return F;
-  };
-  function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
-    MeasurementMatrix H;
-    H << 1, 0, 0, 0, 0;
-    return H;
-  };
-  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = [=]() {
-    ProcessNoiseCovarianceMatrix Q;
-    NoiseGainMatrix Gamma;
-    VProcessNoiseGainMatrix V;
-    Gamma <<
-      0.5*Ts*Ts,
-      Ts;
 
-    V << 0;
-
-    Q = Gamma*V*Gamma.transpose();
-    return Q;
-  };
-  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
-    MeasurementCovarianceMatrix R;
-    R<<1;//variance/standard deviation for page 218
-    return R;
-  };
-
-  KalmanFilter myKalmanFilter(Ts,
-                              _systemMatrixGenerator,
-                              _measurementMatrixGenerator,
-                              _processNoiseCovarianceGenerator,
-                              _measurementCovarianceGenerator);
 
   MeasurementVector z0,z1;
   z0(0) = range.Measure(target);
@@ -82,10 +90,17 @@ int main() {
   z1(0) = range.Measure(target);
   target.Advance();
 
+  ofstream exampleData;
+  KalmanFilter myKalmanFilter = setupKalmanFilter();
   myKalmanFilter.Initialize(z0,z1);
+  for(int i = 0;i<10;i++) {
+    z1(0) = range.Measure(target);
+    auto myPair = myKalmanFilter.Update(z1);
+    cout<<myPair.first<<endl;
+    target.Advance();
+  }
   //MeasurementVector z;
-  //auto myPair = myKalmanFilter.Update(z);
-  //cout<<myPair.first<<endl;
+
 
 
 

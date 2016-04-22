@@ -16,11 +16,23 @@ KalmanFilter::KalmanFilter(TimeType Ts,
                             _measurementCovarianceGenerator(measurementCovarianceGenerator) { }
 
 void KalmanFilter::Initialize(MeasurementVector z0,MeasurementVector z1) {
-
+  _x(0) = z1(0);
+  double xDot = (z1(0)-z0(0))/_Ts;
+  _x(1) = xDot;
+  _x(2) = _x(3) = _x(4) = 0;
+  _R = _measurementCovarianceGenerator();
+  double Rx = _R(0,0);
+  _P<< Rx, Rx/_Ts, 0,0,0,
+       Rx/_Ts, 2*Rx/(_Ts*_Ts), 0,0,0,
+       0,0,0,0,0,
+       0,0,0,0,0,
+       0,0,0,0,0;
+  cout<<"_x = "<<_x<<endl<<endl<<"_P = "<<_P<<endl;
 }
 
 pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector measurement) {
   _F = _systemMatrixGenerator();//system matrix
+  cout<<"HERE"<<endl;
   _Q = _processNoiseCovarianceGenerator();//process noise covariance
   _R = _measurementCovarianceGenerator();//measurement noise covariance
   _H = _measurementMatrixGenerator();//measurement matrix
