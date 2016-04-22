@@ -4,16 +4,10 @@
 
 #include "../include/Target.h"
 
-Target::Target(const string& name, string dataFile): _name(name), _dataFile(dataFile){
+Target::Target(string dataFile): _dataFile(dataFile){
   _data = ifstream(_dataFile);
   Advance();
 }
-
-Target::Target(const string&& name, string dataFile): _name(move(name)), _dataFile(dataFile){
-  _data = ifstream(_dataFile);
-  Advance();
-}
-
 void Target::Print(const string&& message) {
   cout<<move(message)<<endl;
 }

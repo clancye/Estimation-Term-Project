@@ -15,15 +15,14 @@
 using namespace std;
 
 class Target {
-  string _name, _dataFile;
+  string _dataFile;
   StateVector _state;
   ifstream _data;
   public:
-  Target(const string& name, string dataFile);
-  Target(const string&& name, string dataFile);
+  Target(string dataFile);
   ~Target() {
     _data.close();
-    Print("Deleting target \"" + _name + "\"");
+    Print("Deleting target");
   }
   void Advance(int times = 1);
   StateVector Sample();

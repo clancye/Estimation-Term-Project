@@ -14,7 +14,7 @@
 using namespace std;
 
 class KalmanFilter {
-  TimeType _t;//time
+  TimeType _t,_Ts;//time, sampling time
 
   StateVector _x;//state estimate
   MeasurementVector _z, _v;// measurement estimate, and residual
@@ -38,12 +38,13 @@ class KalmanFilter {
 
   public:
   KalmanFilter(){}
-  KalmanFilter(function<SystemMatrix()> systemMatrixGenerator,
+  KalmanFilter(TimeType Ts,
+               function<SystemMatrix()> systemMatrixGenerator,
                function<MeasurementMatrix()> measurementMatrixGenerator,
                function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
                function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator);
 
-  void Initialize(StateVector initialState, StateCovarianceMatrix initialCovariance);
+  void Initialize(MeasurementVector z0,MeasurementVector z1);
   pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
 };
 

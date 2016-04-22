@@ -4,18 +4,19 @@
 
 #include "../include/KalmanFilter.h"
 
-KalmanFilter::KalmanFilter(function<SystemMatrix()> systemMatrixGenerator,
+KalmanFilter::KalmanFilter(TimeType Ts,
+                          function<SystemMatrix()> systemMatrixGenerator,
                           function<MeasurementMatrix()> measurementMatrixGenerator,
                           function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
                           function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator):
+                            _Ts(Ts),
                             _systemMatrixGenerator(systemMatrixGenerator),
                             _measurementMatrixGenerator(measurementMatrixGenerator),
                             _processNoiseCovarianceGenerator(processNoiseCovarianceGenerator),
                             _measurementCovarianceGenerator(measurementCovarianceGenerator) { }
 
-void KalmanFilter::Initialize(StateVector initialState, StateCovarianceMatrix initialCovariance) {
-  _x = initialState;
-  _P = initialCovariance;
+void KalmanFilter::Initialize(MeasurementVector z0,MeasurementVector z1) {
+
 }
 
 pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector measurement) {
