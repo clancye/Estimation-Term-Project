@@ -3,32 +3,35 @@
 using namespace std;
 
 list<function<double(StateVector,StateVector)>> getMeasurementFunctions() {
-  list<function<double(StateVector,StateVector)>> functions;
-  random_device random_device1,random_device2;
+  list<function<double(StateVector, StateVector)>> functions;
+  random_device random_device1, random_device2;
   mt19937 rangeNoiseGenerator(random_device1()), angleNoiseGenerator(random_device2());
-  normal_distribution<double> rangeNoise(0,50),angleNoise(0,.01745);//page 488, angle in rads
-  auto Range = function<double(StateVector,StateVector)> (
-          [rangeNoise,rangeNoiseGenerator]
+  normal_distribution<double> rangeNoise(0, 50), angleNoise(0, .01745);//page 488, angle in rads
+  auto Range = function<double(StateVector, StateVector)>(
+          [rangeNoise, rangeNoiseGenerator]
                   (StateVector sensorState, StateVector targetState) mutable {
             double range = 0;
             int size = sensorState.size();
-            for(int i = 0; i<size;i++) {
-              range += pow(sensorState(i)-targetState(i),2);
+            for (int i = 0; i < size; i++) {
+              range += pow(sensorState(i) - targetState(i), 2);
             }
             range = sqrt(range);
             range += rangeNoise(rangeNoiseGenerator);
             return range;
           });
-  auto Azimuth = function<double(StateVector,StateVector)> (
-          [angleNoise,angleNoiseGenerator]
+  functions.push_back(Range);
+  StateVector x;
+  if (x.size() > 4) {
+  auto Azimuth = function<double(StateVector, StateVector)>(
+          [angleNoise, angleNoiseGenerator]
                   (StateVector sensorState, StateVector targetState) mutable {
-            double x0 = sensorState(0), x1 = targetState(0), y0  = sensorState(2), y1 = targetState(2),azimuth;
-            azimuth = atan2(y1-y0,x1-x0);
+            double x0 = sensorState(0), x1 = targetState(0), y0 = sensorState(2), y1 = targetState(2), azimuth;
+            azimuth = atan2(y1 - y0, x1 - x0);
             azimuth += angleNoise(angleNoiseGenerator);
             return azimuth;
           });
-  functions.push_back(Range);
-  functions.push_back(Azimuth);
+    functions.push_back(Azimuth);
+  }
   return functions;
 }
 
@@ -43,7 +46,10 @@ int main() {
   Target target("My Target",filename);
 
   StateVector sensorState;
-  sensorState << -10000,0,0,0,0;
+  if(sensorState.size()==5)
+    sensorState << -10000,0,0,0,0;//for term project
+  else
+    sensorState<< 0,10;//for example code
 
   auto measurementFunctions = getMeasurementFunctions();
 
