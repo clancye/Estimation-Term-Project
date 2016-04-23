@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 #include <functional>
+#include <fstream>
 
 
 using namespace std;
@@ -33,8 +34,6 @@ class KalmanFilter {
   function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator;
   function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator;
 
-  vector<pair<StateVector,StateCovarianceMatrix>>  _predictions;
-
   void UpdateCovarianceAndGain();
   void UpdateStateEstimate(MeasurementVector z);
 
@@ -48,6 +47,8 @@ class KalmanFilter {
 
   void Initialize(MeasurementVector z0,MeasurementVector z1);
   pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
+
+  friend ofstream& operator<<(ofstream& of,const KalmanFilter& kf);
 };
 
 #endif //ESTIMATION_PROJECT_2016_KALMANFILTER_H

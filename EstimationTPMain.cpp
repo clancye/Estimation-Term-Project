@@ -28,7 +28,7 @@ KalmanFilter setupKalmanFilter() {
             Ts,
             Ts;
 
-    V << 0;
+    V << 1;//sigma v
 
     Q = Gamma*V*Gamma.transpose();
     return Q;
@@ -50,18 +50,18 @@ KalmanFilter setupKalmanFilter() {
 
 int main() {
   cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
-  string dataset,filename, configID;
+  string dataset,filename, configID, path="/home/clancy/Projects/Estimation Project 2016/";
   cin >> dataset;
   if(dataset == "1") {
-    filename = "/home/clancy/Projects/Estimation Project 2016/Term Project Data.txt";
+    filename = path + "Term Project Data.txt";
     configID = "term project";//check DataGenerator.h for correct config IDs
   }
   else if(dataset == "2") {
-    filename = "/home/clancy/Projects/Estimation Project 2016/page218Example.txt";
+    filename = path + "page218Example.txt";
     configID = "pg218 example";//check DataGenerator.h for correct config IDs
   }
   else if(dataset == "3") {
-    filename = "/home/clancy/Projects/Estimation Project 2016/test.txt";
+    filename = path + "test.txt";
     configID = "term project";//check DataGenerator.h for correct config IDs
   }
 
@@ -81,7 +81,8 @@ int main() {
 
   RangeSensor range(sensorState,0,1);
 
-  /* Instantiate the Kalman Filter*/
+  /* Make the Kalman Filter*/
+  KalmanFilter myKalmanFilter = setupKalmanFilter();
 
 
   MeasurementVector z0,z1;
@@ -90,16 +91,17 @@ int main() {
   z1(0) = range.Measure(target);
   target.Advance();
 
-  ofstream exampleData;
-  KalmanFilter myKalmanFilter = setupKalmanFilter();
+
+  ofstream exampleData(path+"exampleKFData.txt");
   myKalmanFilter.Initialize(z0,z1);
-  for(int i = 0;i<10;i++) {
+  for(int i = 0;i<90;i++) {
     z1(0) = range.Measure(target);
     auto myPair = myKalmanFilter.Update(z1);
     cout<<myPair.first<<endl;
+    exampleData <<myKalmanFilter;
     target.Advance();
   }
-  //MeasurementVector z;
+  exampleData.close();
 
 
 
