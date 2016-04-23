@@ -9,26 +9,12 @@ KalmanFilter::KalmanFilter(TimeType Ts,
                           function<MeasurementMatrix()> measurementMatrixGenerator,
                           function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
                           function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator):
-                            _Ts(Ts),
-                            _systemMatrixGenerator(systemMatrixGenerator),
-                            _measurementMatrixGenerator(measurementMatrixGenerator),
-                            _processNoiseCovarianceGenerator(processNoiseCovarianceGenerator),
-                            _measurementCovarianceGenerator(measurementCovarianceGenerator) { }
+                            Filter(Ts,
+                            systemMatrixGenerator,
+                            measurementMatrixGenerator,
+                            processNoiseCovarianceGenerator,
+                            measurementCovarianceGenerator){ }
 
-void KalmanFilter::Initialize(MeasurementVector z0,MeasurementVector z1) {
-  _x(0) = z1(0);
-  double xDot = (z1(0)-z0(0))/_Ts;
-  _x(1) = xDot;
-  _x(2) = _x(3) = _x(4) = 0;
-  _R = _measurementCovarianceGenerator();
-  double Rx = _R(0,0);
-  _P<< Rx, Rx/_Ts, 0,0,0,
-       Rx/_Ts, 2*Rx/(_Ts*_Ts), 0,0,0,
-       0,0,0,0,0,
-       0,0,0,0,0,
-       0,0,0,0,0;
-  cout<<"_x = "<<_x<<endl<<endl<<"_P = "<<_P<<endl;
-}
 
 pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector measurement) {
   _F = _systemMatrixGenerator();//system matrix
@@ -43,26 +29,12 @@ pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector m
   return estimates;
 }
 
-void KalmanFilter::UpdateCovarianceAndGain() {
-  _P = _F*_P*_F.transpose()+_Q;
-  _S = _R + _H*_P*_H.transpose();//measurement prediction covariance
-  _W = _P*_H.transpose()*_S.inverse();//gain matrix
-  _P = _P - _W*_S*_W.transpose();
-}
-
 void KalmanFilter::UpdateStateEstimate(MeasurementVector z) {
-  _x = _F*_x;
+  PredictState();
   _z = _H*_x;
   _v = z - _z;//actual measurement less predicted
   _x = _x + _W*_v;
 }
 
-ofstream& operator<<(ofstream& of,  const KalmanFilter& kf) {
-  IOFormat OctaveFmt(StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");//Formatting for outputting Eigen matrix
-  of << "t = "<<kf._t<<endl;
-  of << "x = "<<kf._x.format(OctaveFmt)<<endl;
-  of << "P = "<<kf._P.format(OctaveFmt)<<endl;
-  of << "W = "<<kf._W.format(OctaveFmt)<<endl;
-  return of;
-}
+
 

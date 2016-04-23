@@ -47,6 +47,54 @@ KalmanFilter setupKalmanFilter() {
 
   return myKalmanFilter;
 }
+/*
+ExtendedKalmanFilter setupExtendedKalmanFilter() {
+  DataType Ts = 1;//sampling time
+  function<SystemMatrix()> _systemMatrixGenerator = [=]() {
+    SystemMatrix F;
+    F << 1, Ts, 0, 0, 0,
+            0, 1, 0, 0, 0,
+            0, 0, 1, Ts, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1;
+    return F;
+  };
+  function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
+    MeasurementMatrix H;
+    H << 1, 0, 0, 0, 0;
+    return H;
+  };
+  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = [=]() {
+    ProcessNoiseCovarianceMatrix Q;
+    NoiseGainMatrix Gamma;
+    VProcessNoiseGainMatrix V;
+    Gamma <<
+    0.5*Ts*Ts,
+            Ts,
+            0,
+            0,
+            0;
+
+    V << 1;//sigma v
+
+    Q = Gamma*V*Gamma.transpose();
+    return Q;
+  };
+  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
+    MeasurementCovarianceMatrix R;
+    R<<1;//variance/standard deviation for page 218
+    return R;
+  };
+
+  ExtendedKalmanFilter myKalmanFilter(Ts,
+                              _systemMatrixGenerator,
+                              _measurementMatrixGenerator,
+                              _processNoiseCovarianceGenerator,
+                              _measurementCovarianceGenerator);
+
+  return myExtendedKalmanFilter;
+}
+*/
 
 int main() {
   cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
