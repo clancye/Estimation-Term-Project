@@ -5,23 +5,54 @@
 #ifndef ESTIMATION_PROJECT_2016_KALMANFILTER_H
 #define ESTIMATION_PROJECT_2016_KALMANFILTER_H
 
-#include "Filter.h"
+#include "EstimationTPTypeDefinitions.h"
+
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <fstream>
 
 using namespace std;
 
-class KalmanFilter : public Filter {
+class KalmanFilter {
+  protected:
+  TimeType _Ts;//sampling time
+  volatile int _t = 0;//actual time in units in which the system advances
+
+  StateVector _x;//state estimate
+  MeasurementVector _z, _v;// measurement estimate, and residual
+  StateCovarianceMatrix _P;//covariance matrix
+  GainMatrix _W;//gain matrix
+  SystemMatrix _F;//system matrix
+  ProcessNoiseCovarianceMatrix _Q;//noise covariance
+  MeasurementCovarianceMatrix _R;//measurement covariance
+  MeasurementMatrix _H;//measurement matrix
+  MeasurementCovarianceMatrix _S;//measurement prediction covariance
+
+
+  function<SystemMatrix()> _systemMatrixGenerator;
+  function<MeasurementMatrix()> _measurementMatrixGenerator;
+  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator;
+  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator;
+  function<StateVector(StateVector)> _predictState;
 
   void UpdateStateEstimate(MeasurementVector z);
+  void UpdateCovarianceAndGain();
 
   public:
-  KalmanFilter():Filter(){}
+  KalmanFilter(){}
   KalmanFilter(TimeType Ts,
-               function<SystemMatrix()> systemMatrixGenerator,
-               function<MeasurementMatrix()> measurementMatrixGenerator,
-               function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
-               function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator);
+              function<SystemMatrix()> systemMatrixGenerator,
+              function<MeasurementMatrix()> measurementMatrixGenerator,
+              function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
+              function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator,
+              function<StateVector(StateVector)> predictState);
 
   pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
+  void Initialize(MeasurementVector z0,MeasurementVector z1);
+
+  friend ofstream& operator<<(ofstream& of,const KalmanFilter& kf);
 
 };
 

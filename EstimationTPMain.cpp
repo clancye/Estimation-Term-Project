@@ -3,7 +3,7 @@
 using namespace std;
 KalmanFilter setupKalmanFilter() {
   DataType Ts = 1;//sampling time
-  function<SystemMatrix()> _systemMatrixGenerator = [=]() {
+  function<SystemMatrix()> systemMatrixGenerator = [=]() {
     SystemMatrix F;
     F << 1, Ts, 0, 0, 0,
          0, 1, 0, 0, 0,
@@ -12,12 +12,12 @@ KalmanFilter setupKalmanFilter() {
          0, 0, 0, 0, 1;
     return F;
   };
-  function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
+  function<MeasurementMatrix()> measurementMatrixGenerator = []() {
     MeasurementMatrix H;
     H << 1, 0, 0, 0, 0;
     return H;
   };
-  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = [=]() {
+  function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator = [=]() {
     ProcessNoiseCovarianceMatrix Q;
     NoiseGainMatrix Gamma;
     VProcessNoiseGainMatrix V;
@@ -33,17 +33,22 @@ KalmanFilter setupKalmanFilter() {
     Q = Gamma*V*Gamma.transpose();
     return Q;
   };
-  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
+  function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator = []() {
     MeasurementCovarianceMatrix R;
     R<<1;//variance/standard deviation for page 218
     return R;
   };
-
+  function<StateVector(StateVector)> predictState = [systemMatrixGenerator] (StateVector x) {
+    SystemMatrix F = systemMatrixGenerator();
+    StateVector nextX = F*x;
+    return nextX;
+  };
   KalmanFilter myKalmanFilter(Ts,
-                              _systemMatrixGenerator,
-                              _measurementMatrixGenerator,
-                              _processNoiseCovarianceGenerator,
-                              _measurementCovarianceGenerator);
+                             systemMatrixGenerator,
+                             measurementMatrixGenerator,
+                             processNoiseCovarianceGenerator,
+                             measurementCovarianceGenerator,
+                             predictState);
 
   return myKalmanFilter;
 }
