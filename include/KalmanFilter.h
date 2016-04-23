@@ -49,7 +49,7 @@ class KalmanFilter {
               function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator,
               function<StateVector(StateVector)> predictState);
 
-  pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
+  virtual pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
   void Initialize(MeasurementVector z0,MeasurementVector z1);
 
   friend ofstream& operator<<(ofstream& of,const KalmanFilter& kf);

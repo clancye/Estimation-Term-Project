@@ -55,6 +55,58 @@ KalmanFilter setupKalmanFilter() {
 /*
 ExtendedKalmanFilter setupExtendedKalmanFilter() {
   DataType Ts = 1;//sampling time
+  function<SystemMatrix()> systemMatrixGenerator = [=]() {
+    SystemMatrix F;
+    F << 1, Ts, 0, 0, 0,
+            0, 1, 0, 0, 0,
+            0, 0, 1, Ts, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1;
+    return F;
+  };
+  function<MeasurementMatrix()> measurementMatrixGenerator = []() {
+    MeasurementMatrix H;
+    H << 1, 0, 0, 0, 0;
+    return H;
+  };
+  function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator = [=]() {
+    ProcessNoiseCovarianceMatrix Q;
+    NoiseGainMatrix Gamma;
+    VProcessNoiseGainMatrix V;
+    Gamma <<
+    0.5*Ts*Ts,
+            Ts,
+            0,
+            0,
+            0;
+
+    V << 1;//sigma v
+
+    Q = Gamma*V*Gamma.transpose();
+    return Q;
+  };
+  function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator = []() {
+    MeasurementCovarianceMatrix R;
+    R<<1;//variance/standard deviation for page 218
+    return R;
+  };
+  function<StateVector(StateVector)> predictState = [systemMatrixGenerator] (StateVector x) {
+    SystemMatrix F = systemMatrixGenerator();
+    StateVector nextX = F*x;
+    return nextX;
+  };
+  ExtendedKalmanFilter myExtendedKalmanFilter(Ts,
+                              systemMatrixGenerator,
+                              measurementMatrixGenerator,
+                              processNoiseCovarianceGenerator,
+                              measurementCovarianceGenerator,
+                              predictState);
+
+  return myExtendedKalmanFilter;
+}*/
+/*
+ExtendedKalmanFilter setupExtendedKalmanFilter() {
+  DataType Ts = 1;//sampling time
   function<SystemMatrix()> _systemMatrixGenerator = [=]() {
     SystemMatrix F;
     F << 1, Ts, 0, 0, 0,
