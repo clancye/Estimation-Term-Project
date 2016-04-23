@@ -39,12 +39,13 @@ pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector m
   UpdateCovarianceAndGain();
   UpdateStateEstimate(measurement);
   pair<StateVector, StateCovarianceMatrix> estimates = make_pair(_x,_P);
+  _t++;
   return estimates;
 }
 
 void KalmanFilter::UpdateCovarianceAndGain() {
   _P = _F*_P*_F.transpose()+_Q;
-  _S = _R + _H*_P*_H.transpose();//measurement prediction covarianc
+  _S = _R + _H*_P*_H.transpose();//measurement prediction covariance
   _W = _P*_H.transpose()*_S.inverse();//gain matrix
   _P = _P - _W*_S*_W.transpose();
 }
@@ -58,6 +59,8 @@ void KalmanFilter::UpdateStateEstimate(MeasurementVector z) {
 
 ofstream& operator<<(ofstream& of,  const KalmanFilter& kf) {
   IOFormat OctaveFmt(StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");//Formatting for outputting Eigen matrix
+  of << "t = "<<kf._t<<endl;
+  of << "x = "<<kf._x.format(OctaveFmt)<<endl;
   of << "P = "<<kf._P.format(OctaveFmt)<<endl;
   of << "W = "<<kf._W.format(OctaveFmt)<<endl;
   return of;

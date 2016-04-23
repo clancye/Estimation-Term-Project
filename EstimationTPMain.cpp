@@ -6,10 +6,10 @@ KalmanFilter setupKalmanFilter() {
   function<SystemMatrix()> _systemMatrixGenerator = [=]() {
     SystemMatrix F;
     F << 1, Ts, 0, 0, 0,
-            0, 1, 0, 0, 0,
-            0, 0, 1, Ts, 0,
-            0, 0, 0, 1, 0,
-            0, 0, 0, 0, 1;
+         0, 1, 0, 0, 0,
+         0, 0, 1, Ts, 0,
+         0, 0, 0, 1, 0,
+         0, 0, 0, 0, 1;
     return F;
   };
   function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
@@ -24,9 +24,9 @@ KalmanFilter setupKalmanFilter() {
     Gamma <<
     0.5*Ts*Ts,
             Ts,
-            0.5*Ts*Ts,
-            Ts,
-            Ts;
+            0,
+            0,
+            0;
 
     V << 1;//sigma v
 

@@ -17,7 +17,8 @@
 using namespace std;
 
 class KalmanFilter {
-  TimeType _t,_Ts;//time, sampling time
+  TimeType _Ts;//sampling time
+  volatile int _t = 0;//actual time in units in which the system advances
 
   StateVector _x;//state estimate
   MeasurementVector _z, _v;// measurement estimate, and residual
