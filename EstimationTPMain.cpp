@@ -80,7 +80,7 @@ ExtendedKalmanFilter setupExtendedKalmanFilter(StateVector sensorState, TimeType
   };
   function<SystemMatrix(StateVector)> generateSystemMatrix = [=] (StateVector x) mutable {
     double Om = x(4);//Omega
-    if(abs(Om)>.3) {
+    if(abs(Om)>.001) {
       double s = sin (Om*Ts), c = cos(Om*Ts);//omega, and the trig terms
       StateVector j = calculateJacobians(x);
       F <<1, s/Om,        0, (1-c)/Om, j(0),
@@ -102,7 +102,7 @@ ExtendedKalmanFilter setupExtendedKalmanFilter(StateVector sensorState, TimeType
   function<StateVector(StateVector)> predictState = [=] (StateVector x) mutable{
     ProcessNoiseVector sigmaV;
     double Om = x(4);
-    if(abs(Om)>.3) {//don't use the limiting form!
+    if(abs(Om)>.001) {//don't use the limiting form!
       double s = sin (Om*Ts), c = cos(Om*Ts);//omega, and the trig terms
       F <<1, s/Om,     0, (1-c)/Om, 0,
           0, c,           0, -s,          0,
@@ -167,7 +167,7 @@ int main() {
   KalmanFilter kf1 = setupKalmanFilter(sensorState,Ts,V1);
   V2<< 1, 0, 0,
        0, 1, 0,
-       0, 0, .1;
+       0, 0, .08;
   ExtendedKalmanFilter ekf1 = setupExtendedKalmanFilter(sensorState,Ts,V2);
 
   MeasurementVector z0,z1;
