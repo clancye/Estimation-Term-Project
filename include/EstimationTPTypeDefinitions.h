@@ -11,7 +11,7 @@ using namespace Eigen;
 
 #define NUM_FILTERS  2
 #define  NUM_STATES  5
-#define  NUM_MEASUREMENTS  1
+#define  NUM_MEASUREMENTS  2
 #define  NUM_PROCESS_NOISES  3
 
 typedef double DataType;

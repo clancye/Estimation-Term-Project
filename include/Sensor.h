@@ -22,11 +22,11 @@ class Sensor {
   normal_distribution<double> _distribution;
 
   public:
-  Sensor(StateVector sensorState, double mean, double variance):
+  Sensor(StateVector sensorState, double mean, double stddev):
           _sensorState(sensorState),
           _rd(),
           _generator(_rd()),
-          _distribution(mean,variance){}
+          _distribution(mean,stddev){}
   virtual double Measure(Target& aTarget) = 0;
 };
 

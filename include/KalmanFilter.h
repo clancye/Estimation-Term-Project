@@ -18,6 +18,7 @@ using namespace std;
 
 class KalmanFilter {
   protected:
+  StateVector _sensorState;
   TimeType _Ts;//sampling time
   volatile int _t = 0;//actual time in units in which the system advances
 
@@ -38,9 +39,11 @@ class KalmanFilter {
   void UpdateStateEstimate(MeasurementVector z);
   void UpdateCovarianceAndGain();
   void PredictState();
+  MeasurementVector ConvertToCartesian(MeasurementVector z);
   public:
   KalmanFilter();
-  KalmanFilter(TimeType Ts,
+  KalmanFilter(StateVector sensorState,
+              TimeType Ts,
               SystemMatrix F,
               VProcessNoiseGainMatrix V,
               NoiseGainMatrix Gamma,

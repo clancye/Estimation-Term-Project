@@ -1,16 +1,16 @@
 #include "EstimationTPMain.h"
 
 using namespace std;
-KalmanFilter setupKalmanFilter() {
-  TimeType Ts = 1;//sampling time
+KalmanFilter setupKalmanFilter(StateVector sensorState) {
+  TimeType Ts = 10;//sampling time
   SystemMatrix F;
   NoiseGainMatrix Gamma;
   MeasurementMatrix H;
   ProcessNoiseCovarianceMatrix Q;
   MeasurementCovarianceMatrix R;
   VProcessNoiseGainMatrix V;
-  V << 1, 0, 0,
-       0, 0, 0,
+  V << 5, 0, 0,
+       0, 5, 0,
        0, 0, 0;//sigma v
   random_device rd;
   mt19937 generatorX(rd()), generatorY(rd()), generatorOmega(rd());
@@ -35,14 +35,12 @@ KalmanFilter setupKalmanFilter() {
        0, 0, 0, 0, 1;
 
   Q = Gamma*V*Gamma.transpose();
-  H<<1, 0, 0, 0, 0;
-  R<<1;
-//  H << 1, 0, 0, 0, 0,
-//          0, 0, 1, 0, 0;
-//  R<<2500, 0,
-//     0,    .0174533;
+  H << 1, 0, 0, 0, 0,
+       0, 0, 1, 0, 0;
+  R<<2500, 0,
+     0,    .0003046;
 
-  KalmanFilter myKalmanFilter(Ts, F, V, Gamma,R, H, Q,makeProcessNoise);
+  KalmanFilter myKalmanFilter(sensorState, Ts, F, V, Gamma,R, H, Q,makeProcessNoise);
 
   return myKalmanFilter;
 }
@@ -178,27 +176,30 @@ int main() {
   else
     sensorState<< 0,0,0,0,0;//for example from page 218
 
-  RangeSensor range(sensorState,0,1);
+  RangeSensor range(sensorState,0,50);//std dev
+  AzimuthSensor azimuth(sensorState,0,.01745);//std dev
 
   /* Make the Kalman Filter*/
-  KalmanFilter myKalmanFilter = setupKalmanFilter();
+  KalmanFilter myKalmanFilter = setupKalmanFilter(sensorState);
 
 
   MeasurementVector z0,z1;
   z0(0) = range.Measure(target);
-  target.Advance();
+  z0(1) = azimuth.Measure(target);
+  target.Advance(10);
   z1(0) = range.Measure(target);
-  target.Advance();
+  z1(1) = azimuth.Measure(target);
+  target.Advance(10);
 
 
   ofstream exampleData(path+"exampleKFData.txt");
   myKalmanFilter.Initialize(z0,z1);
-  for(int i = 0;i<90;i++) {
+  for(int i = 0;i<48;i++) {
     z1(0) = range.Measure(target);
+    z1(1) = azimuth.Measure(target);
     auto myPair = myKalmanFilter.Update(z1);
-    cout<<myKalmanFilter.getProcessNoise()<<endl;
     exampleData <<myKalmanFilter;
-    target.Advance();
+    target.Advance(10);
   }
   exampleData.close();
 
