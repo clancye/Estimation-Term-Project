@@ -8,14 +8,14 @@ KalmanFilter::KalmanFilter(){ }
 
 KalmanFilter::KalmanFilter(StateVector sensorState,
                           TimeType Ts,
-                          SystemMatrix F,
+                          function<SystemMatrix(StateVector)> generateSystemMatrix,
                           MeasurementCovarianceMatrix R,
                           MeasurementMatrix H,
                           ProcessNoiseCovarianceMatrix Q,
                           function<StateVector(StateVector)> predictState):
                             _sensorState(sensorState),
                             _Ts(Ts),
-                            _F(F),
+                            _generateSystemMatrix(generateSystemMatrix),
                             _R(R),
                             _H(H),
                             _Q(Q),
@@ -44,6 +44,7 @@ void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
 
 pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector measurement) {
   measurement = ConvertToCartesian(measurement);
+  _F = _generateSystemMatrix(_x);
   UpdateCovarianceAndGain();
   UpdateStateEstimate(measurement);
   pair<StateVector, StateCovarianceMatrix> estimates = make_pair(_x,_P);

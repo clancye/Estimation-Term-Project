@@ -10,6 +10,7 @@
 #include <functional>
 #include <fstream>
 #include <random>
+#include <cmath>
 
 #include "include/EstimationTPTypeDefinitions.h"
 #include "include/KalmanFilter.h"

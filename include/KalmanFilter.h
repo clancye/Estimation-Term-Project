@@ -33,6 +33,7 @@ class KalmanFilter {
   MeasurementMatrix _H;//measurement matrix
   MeasurementCovarianceMatrix _S;//measurement prediction covariance
   function<StateVector(StateVector)> _predictState;
+  function<SystemMatrix(StateVector)> _generateSystemMatrix;
 
   void UpdateStateEstimate(MeasurementVector z);
   void UpdateCovarianceAndGain();
@@ -42,7 +43,7 @@ class KalmanFilter {
   KalmanFilter();
   KalmanFilter(StateVector sensorState,
               TimeType Ts,
-              SystemMatrix F,
+              function<SystemMatrix(StateVector)> generateSystemMatrix,
               MeasurementCovarianceMatrix R,
               MeasurementMatrix H,
               ProcessNoiseCovarianceMatrix Q,
