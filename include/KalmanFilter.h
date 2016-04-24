@@ -12,6 +12,7 @@
 #include <vector>
 #include <functional>
 #include <fstream>
+#include <random>
 
 using namespace std;
 
@@ -25,33 +26,31 @@ class KalmanFilter {
   StateCovarianceMatrix _P;//covariance matrix
   GainMatrix _W;//gain matrix
   SystemMatrix _F;//system matrix
+  VProcessNoiseGainMatrix _V;
+  NoiseGainMatrix _Gamma;
   ProcessNoiseCovarianceMatrix _Q;//noise covariance
   MeasurementCovarianceMatrix _R;//measurement covariance
   MeasurementMatrix _H;//measurement matrix
   MeasurementCovarianceMatrix _S;//measurement prediction covariance
-
-
-  function<SystemMatrix()> _systemMatrixGenerator;
-  function<MeasurementMatrix()> _measurementMatrixGenerator;
-  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator;
-  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator;
-  function<StateVector(StateVector)> _predictState;
+  function<double()> _makeNoise;
 
   void UpdateStateEstimate(MeasurementVector z);
   void UpdateCovarianceAndGain();
-
+  void PredictState();
   public:
-  KalmanFilter(){}
+  KalmanFilter();
   KalmanFilter(TimeType Ts,
-              function<SystemMatrix()> systemMatrixGenerator,
-              function<MeasurementMatrix()> measurementMatrixGenerator,
-              function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
-              function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator,
-              function<StateVector(StateVector)> predictState);
+              SystemMatrix F,
+              VProcessNoiseGainMatrix V,
+              NoiseGainMatrix Gamma,
+              MeasurementCovarianceMatrix R,
+              MeasurementMatrix H,
+              ProcessNoiseCovarianceMatrix Q,
+              function<double()> makeNoise);
 
   virtual pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
   void Initialize(MeasurementVector z0,MeasurementVector z1);
-
+  double getNoise();
   friend ofstream& operator<<(ofstream& of,const KalmanFilter& kf);
 
 };

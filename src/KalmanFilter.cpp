@@ -4,18 +4,24 @@
 
 #include "../include/KalmanFilter.h"
 
+KalmanFilter::KalmanFilter(){ }
+
 KalmanFilter::KalmanFilter(TimeType Ts,
-                          function<SystemMatrix()> systemMatrixGenerator,
-                          function<MeasurementMatrix()> measurementMatrixGenerator,
-                          function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator,
-                          function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator,
-                          function<StateVector(StateVector)> predictState):
+                          SystemMatrix F,
+                          VProcessNoiseGainMatrix V,
+                          NoiseGainMatrix Gamma,
+                          MeasurementCovarianceMatrix R,
+                          MeasurementMatrix H,
+                          ProcessNoiseCovarianceMatrix Q,
+                          function<double()> makeNoise):
                             _Ts(Ts),
-                            _systemMatrixGenerator(systemMatrixGenerator),
-                            _measurementMatrixGenerator(measurementMatrixGenerator),
-                            _processNoiseCovarianceGenerator(processNoiseCovarianceGenerator),
-                            _measurementCovarianceGenerator(measurementCovarianceGenerator),
-                            _predictState(predictState){ }
+                            _F(F),
+                            _V(V),
+                            _Gamma(Gamma),
+                            _R(R),
+                            _H(H),
+                            _Q(Q),
+                            _makeNoise(makeNoise){ }
 
 void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
   _x(0) = z1(0);//x position
@@ -25,7 +31,6 @@ void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
   //double yDot = (z1(2)-z0(2))/_Ts;
   //_x(3) = yDot;//y speed
   _x(4) = 0;//omega
-  _R = _measurementCovarianceGenerator();
   double Rx = _R(0,0);
   double Ry = _R(0,0);
   _P<< Rx,     Rx/_Ts,         0,      0,              0,
@@ -37,10 +42,6 @@ void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
 }
 
 pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector measurement) {
-  _F = _systemMatrixGenerator();//system matrix
-  _Q = _processNoiseCovarianceGenerator();//process noise covariance
-  _R = _measurementCovarianceGenerator();//measurement noise covariance
-  _H = _measurementMatrixGenerator();//measurement matrix
   UpdateCovarianceAndGain();
   UpdateStateEstimate(measurement);
   pair<StateVector, StateCovarianceMatrix> estimates = make_pair(_x,_P);
@@ -56,10 +57,15 @@ void KalmanFilter::UpdateCovarianceAndGain() {
 }
 
 void KalmanFilter::UpdateStateEstimate(MeasurementVector z) {
-  _x = _predictState(_x);
+  double v = 3;
+  PredictState();
   _z = _H*_x;
   _v = z - _z;//actual measurement less predicted
   _x = _x + _W*_v;
+}
+
+void KalmanFilter::PredictState() {
+  _x = _F*_x;
 }
 
 ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
@@ -69,6 +75,10 @@ ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
   of << "P = "<<filter._P.format(OctaveFmt)<<endl;
   of << "W = "<<filter._W.format(OctaveFmt)<<endl;
   return of;
+}
+
+double KalmanFilter::getNoise() {
+  return _makeNoise();
 }
 
 
