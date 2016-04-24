@@ -13,7 +13,7 @@ KalmanFilter::KalmanFilter(TimeType Ts,
                           MeasurementCovarianceMatrix R,
                           MeasurementMatrix H,
                           ProcessNoiseCovarianceMatrix Q,
-                          function<double()> makeNoise):
+                          function<double()> makeProcessNoise):
                             _Ts(Ts),
                             _F(F),
                             _V(V),
@@ -21,7 +21,7 @@ KalmanFilter::KalmanFilter(TimeType Ts,
                             _R(R),
                             _H(H),
                             _Q(Q),
-                            _makeNoise(makeNoise){ }
+                            _makeProcessNoise(makeProcessNoise){ }
 
 void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
   _x(0) = z1(0);//x position
@@ -77,8 +77,8 @@ ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
   return of;
 }
 
-double KalmanFilter::getNoise() {
-  return _makeNoise();
+double KalmanFilter::getProcessNoise() {
+  return _makeProcessNoise();
 }
 
 

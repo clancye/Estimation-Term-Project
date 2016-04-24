@@ -32,10 +32,10 @@ KalmanFilter setupKalmanFilter() {
   random_device rd;
   mt19937 generator(rd());
   normal_distribution<double> noiseX(0,V(0,0)), noiseY(0,V(1,1)),noiseOmega(0,V(2,2));
-  function<double()> makeNoise = [generator,noiseX,noiseY,noiseOmega] () mutable{
+  function<double()> makeProcessNoise = [generator,noiseX,noiseY,noiseOmega] () mutable{
     return noiseX(generator);
   };
-  KalmanFilter myKalmanFilter(Ts, F, V, Gamma,R, H, Q,makeNoise);
+  KalmanFilter myKalmanFilter(Ts, F, V, Gamma,R, H, Q,makeProcessNoise);
 
   return myKalmanFilter;
 }
@@ -189,7 +189,7 @@ int main() {
   for(int i = 0;i<90;i++) {
     z1(0) = range.Measure(target);
     auto myPair = myKalmanFilter.Update(z1);
-    cout<<myKalmanFilter.getNoise()<<endl;
+    cout<<myKalmanFilter.getProcessNoise()<<endl;
     exampleData <<myKalmanFilter;
     target.Advance();
   }
