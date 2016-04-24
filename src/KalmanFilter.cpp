@@ -9,21 +9,17 @@ KalmanFilter::KalmanFilter(){ }
 KalmanFilter::KalmanFilter(StateVector sensorState,
                           TimeType Ts,
                           SystemMatrix F,
-                          VProcessNoiseGainMatrix V,
-                          NoiseGainMatrix Gamma,
                           MeasurementCovarianceMatrix R,
                           MeasurementMatrix H,
                           ProcessNoiseCovarianceMatrix Q,
-                          function<ProcessNoiseVector()> makeProcessNoise):
+                          function<StateVector(StateVector)> predictState):
                             _sensorState(sensorState),
                             _Ts(Ts),
                             _F(F),
-                            _V(V),
-                            _Gamma(Gamma),
                             _R(R),
                             _H(H),
                             _Q(Q),
-                            _makeProcessNoise(makeProcessNoise){ }
+                            _predictState(predictState){ }
 
 void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
   z0 = ConvertToCartesian(z0);
@@ -71,15 +67,10 @@ void KalmanFilter::UpdateCovarianceAndGain() {
 }
 
 void KalmanFilter::UpdateStateEstimate(MeasurementVector z) {
-  PredictState();
+  _x = _predictState(_x);
   _z = _H*_x;
   _v = z - _z;//actual measurement less predicted
   _x = _x + _W*_v;
-}
-
-void KalmanFilter::PredictState() {
-  _processNoise = _makeProcessNoise();
-  _x = _F*_x + _Gamma*_processNoise;
 }
 
 ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
@@ -89,10 +80,6 @@ ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
   //of << "P = "<<filter._P.format(OctaveFmt)<<endl;
   //of << "W = "<<filter._W.format(OctaveFmt)<<endl;
   return of;
-}
-
-ProcessNoiseVector KalmanFilter::getProcessNoise() {
-  return _makeProcessNoise();
 }
 
 

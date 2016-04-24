@@ -1,25 +1,16 @@
 #include "EstimationTPMain.h"
 
 using namespace std;
-KalmanFilter setupKalmanFilter(StateVector sensorState) {
-  TimeType Ts = 10;//sampling time
+KalmanFilter setupKalmanFilter(StateVector sensorState, TimeType Ts, VProcessNoiseGainMatrix V ) {
   SystemMatrix F;
   NoiseGainMatrix Gamma;
   MeasurementMatrix H;
   ProcessNoiseCovarianceMatrix Q;
   MeasurementCovarianceMatrix R;
-  VProcessNoiseGainMatrix V;
-  V << 5, 0, 0,
-       0, 5, 0,
-       0, 0, 0;//sigma v
   random_device rd;
   mt19937 generatorX(rd()), generatorY(rd()), generatorOmega(rd());
   normal_distribution<double> noiseX(0,V(0,0)), noiseY(0,V(1,1)),noiseOmega(0,V(2,2));
-  function<ProcessNoiseVector()> makeProcessNoise = [=] () mutable{
-    ProcessNoiseVector sigmaV;
-    sigmaV<< noiseX(generatorX), noiseY(generatorY), noiseOmega(generatorOmega);
-    return sigmaV;
-  };
+
   Gamma <<
   0.5*Ts*Ts, 0,         0,
   Ts,        0,         0,
@@ -32,118 +23,66 @@ KalmanFilter setupKalmanFilter(StateVector sensorState) {
        0, 1, 0, 0, 0,
        0, 0, 1, Ts, 0,
        0, 0, 0, 1, 0,
-       0, 0, 0, 0, 1;
-
+       0, 0, 0, 0, 0;
+  function<StateVector(StateVector)> predictState = [=] (StateVector x) mutable{
+    ProcessNoiseVector sigmaV;
+    sigmaV<< noiseX(generatorX), noiseY(generatorY), noiseOmega(generatorOmega);
+    return F*x + Gamma*sigmaV;
+  };
   Q = Gamma*V*Gamma.transpose();
   H << 1, 0, 0, 0, 0,
        0, 0, 1, 0, 0;
   R<<2500, 0,
-     0,    .0003046;
+     0,    .0003046;//.0003046 is 1 degree squared in radians
 
-  KalmanFilter myKalmanFilter(sensorState, Ts, F, V, Gamma,R, H, Q,makeProcessNoise);
+  KalmanFilter myFilter(sensorState, Ts, F, R, H, Q,predictState);
 
-  return myKalmanFilter;
+  return myFilter;
 }
 /*
-ExtendedKalmanFilter setupExtendedKalmanFilter() {
-  DataType Ts = 1;//sampling time
-  function<SystemMatrix()> systemMatrixGenerator = [=]() {
-    SystemMatrix F;
-    F << 1, Ts, 0, 0, 0,
-            0, 1, 0, 0, 0,
-            0, 0, 1, Ts, 0,
-            0, 0, 0, 1, 0,
-            0, 0, 0, 0, 1;
-    return F;
+ExtendedKalmanFilter setupExtendedKalmanFilter(StateVector sensorState) {
+  TimeType Ts = 10;//sampling time
+  SystemMatrix Fstraight, Fturn;
+  NoiseGainMatrix Gamma;
+  MeasurementMatrix H;
+  ProcessNoiseCovarianceMatrix Q;
+  MeasurementCovarianceMatrix R;
+  VProcessNoiseGainMatrix V;
+  V << 1, 0, 0,
+          0, 1, 0,
+          0, 0, 0;//sigma v
+  random_device rd;
+  mt19937 generatorX(rd()), generatorY(rd()), generatorOmega(rd());
+  normal_distribution<double> noiseX(0,V(0,0)), noiseY(0,V(1,1)),noiseOmega(0,V(2,2));
+  function<ProcessNoiseVector()> makeProcessNoise = [=] () mutable{
+    ProcessNoiseVector sigmaV;
+    sigmaV<< noiseX(generatorX), noiseY(generatorY), noiseOmega(generatorOmega);
+    return sigmaV;
   };
-  function<MeasurementMatrix()> measurementMatrixGenerator = []() {
-    MeasurementMatrix H;
-    H << 1, 0, 0, 0, 0;
-    return H;
-  };
-  function<ProcessNoiseCovarianceMatrix()> processNoiseCovarianceGenerator = [=]() {
-    ProcessNoiseCovarianceMatrix Q;
-    NoiseGainMatrix Gamma;
-    VProcessNoiseGainMatrix V;
-    Gamma <<
-    0.5*Ts*Ts,
-            Ts,
-            0,
-            0,
-            0;
+  Gamma <<
+  0.5*Ts*Ts, 0,         0,
+          Ts,        0,         0,
+          0,         0.5*Ts*Ts, 0,
+          0,         Ts,        0,
+          0,         0,         Ts;
 
-    V << 1;//sigma v
 
-    Q = Gamma*V*Gamma.transpose();
-    return Q;
-  };
-  function<MeasurementCovarianceMatrix()> measurementCovarianceGenerator = []() {
-    MeasurementCovarianceMatrix R;
-    R<<1;//variance/standard deviation for page 218
-    return R;
-  };
-  function<StateVector(StateVector)> predictState = [systemMatrixGenerator] (StateVector x) {
-    SystemMatrix F = systemMatrixGenerator();
-    StateVector nextX = F*x;
-    return nextX;
-  };
-  ExtendedKalmanFilter myExtendedKalmanFilter(Ts,
-                              systemMatrixGenerator,
-                              measurementMatrixGenerator,
-                              processNoiseCovarianceGenerator,
-                              measurementCovarianceGenerator,
-                              predictState);
+  Fstraight << 1, Ts, 0, 0, 0,
+          0, 1, 0, 0, 0,
+          0, 0, 1, Ts, 0,
+          0, 0, 0, 1, 0,
+          0, 0, 0, 0, 1;
 
-  return myExtendedKalmanFilter;
+  Q = Gamma*V*Gamma.transpose();
+  H << 1, 0, 0, 0, 0,
+          0, 0, 1, 0, 0;
+  R<<2500, 0,
+          0,    .0003046;//.0003046 is 1 degree squared in radians
+
+  ExtendedKalmanFilter myFilter(sensorState, Ts, Fstraight,R, H, Q,makeProcessNoise);
+
+  return myFilter;
 }*/
-/*
-ExtendedKalmanFilter setupExtendedKalmanFilter() {
-  DataType Ts = 1;//sampling time
-  function<SystemMatrix()> _systemMatrixGenerator = [=]() {
-    SystemMatrix F;
-    F << 1, Ts, 0, 0, 0,
-            0, 1, 0, 0, 0,
-            0, 0, 1, Ts, 0,
-            0, 0, 0, 1, 0,
-            0, 0, 0, 0, 1;
-    return F;
-  };
-  function<MeasurementMatrix()> _measurementMatrixGenerator = []() {
-    MeasurementMatrix H;
-    H << 1, 0, 0, 0, 0;
-    return H;
-  };
-  function<ProcessNoiseCovarianceMatrix()> _processNoiseCovarianceGenerator = [=]() {
-    ProcessNoiseCovarianceMatrix Q;
-    NoiseGainMatrix Gamma;
-    VProcessNoiseGainMatrix V;
-    Gamma <<
-    0.5*Ts*Ts,
-            Ts,
-            0,
-            0,
-            0;
-
-    V << 1;//sigma v
-
-    Q = Gamma*V*Gamma.transpose();
-    return Q;
-  };
-  function<MeasurementCovarianceMatrix()> _measurementCovarianceGenerator = []() {
-    MeasurementCovarianceMatrix R;
-    R<<1;//variance/standard deviation for page 218
-    return R;
-  };
-
-  ExtendedKalmanFilter myKalmanFilter(Ts,
-                              _systemMatrixGenerator,
-                              _measurementMatrixGenerator,
-                              _processNoiseCovarianceGenerator,
-                              _measurementCovarianceGenerator);
-
-  return myExtendedKalmanFilter;
-}
-*/
 
 int main() {
   cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
@@ -180,7 +119,17 @@ int main() {
   AzimuthSensor azimuth(sensorState,0,.01745);//std dev
 
   /* Make the Kalman Filter*/
-  KalmanFilter myKalmanFilter = setupKalmanFilter(sensorState);
+  VProcessNoiseGainMatrix V1,V2;
+  TimeType Ts = 10;
+  V1 << 1, 0, 0,
+       0, 1, 0,
+       0, 0, 0;//sigma v
+  KalmanFilter kf1 = setupKalmanFilter(sensorState,Ts,V1);
+  V2<< .1, 0, 0,
+       0, .1, 0,
+       0, 0, 0;
+  KalmanFilter kf2 = setupKalmanFilter(sensorState,Ts,V2);
+
 
 
   MeasurementVector z0,z1;
@@ -193,12 +142,12 @@ int main() {
 
 
   ofstream exampleData(path+"exampleKFData.txt");
-  myKalmanFilter.Initialize(z0,z1);
+  kf1.Initialize(z0,z1);
   for(int i = 0;i<48;i++) {
     z1(0) = range.Measure(target);
     z1(1) = azimuth.Measure(target);
-    auto myPair = myKalmanFilter.Update(z1);
-    exampleData <<myKalmanFilter;
+    kf1.Update(z1);
+    exampleData <<kf1;
     target.Advance(10);
   }
   exampleData.close();
