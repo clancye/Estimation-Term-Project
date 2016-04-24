@@ -27,12 +27,13 @@ class KalmanFilter {
   GainMatrix _W;//gain matrix
   SystemMatrix _F;//system matrix
   VProcessNoiseGainMatrix _V;
+  ProcessNoiseVector _processNoise;
   NoiseGainMatrix _Gamma;
   ProcessNoiseCovarianceMatrix _Q;//noise covariance
   MeasurementCovarianceMatrix _R;//measurement covariance
   MeasurementMatrix _H;//measurement matrix
   MeasurementCovarianceMatrix _S;//measurement prediction covariance
-  function<double()> _makeProcessNoise;
+  function<ProcessNoiseVector()> _makeProcessNoise;
 
   void UpdateStateEstimate(MeasurementVector z);
   void UpdateCovarianceAndGain();
@@ -46,11 +47,11 @@ class KalmanFilter {
               MeasurementCovarianceMatrix R,
               MeasurementMatrix H,
               ProcessNoiseCovarianceMatrix Q,
-              function<double()> makeProcessNoise);
+              function<ProcessNoiseVector()> makeProcessNoise);
 
   virtual pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
   void Initialize(MeasurementVector z0,MeasurementVector z1);
-  double getProcessNoise();
+  ProcessNoiseVector getProcessNoise();
   friend ofstream& operator<<(ofstream& of,const KalmanFilter& kf);
 
 };

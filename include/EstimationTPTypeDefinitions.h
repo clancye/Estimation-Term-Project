@@ -11,7 +11,7 @@ using namespace Eigen;
 
 #define NUM_FILTERS  2
 #define  NUM_STATES  5
-#define  NUM_MEASUREMENTS  2
+#define  NUM_MEASUREMENTS  1
 #define  NUM_PROCESS_NOISES  3
 
 typedef double DataType;
@@ -27,6 +27,7 @@ typedef Matrix<DataType, NUM_MEASUREMENTS,NUM_MEASUREMENTS> MeasurementPredictio
 typedef Matrix<DataType, NUM_STATES, NUM_MEASUREMENTS> GainMatrix;
 typedef Matrix<DataType, NUM_STATES,NUM_PROCESS_NOISES> NoiseGainMatrix;
 typedef Matrix<DataType, NUM_PROCESS_NOISES,NUM_PROCESS_NOISES> VProcessNoiseGainMatrix;
+typedef Matrix<DataType, NUM_PROCESS_NOISES,1> ProcessNoiseVector;
 
 
 
