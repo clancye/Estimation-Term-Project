@@ -67,48 +67,51 @@ ExtendedKalmanFilter setupExtendedKalmanFilter(StateVector sensorState, TimeType
       0, 0, 1, Ts, 0,
       0, 0, 0, 1, 0,
       0, 0, 0, 0, 1;
+  /* Calculate Jacobians - CHECKED GOOD*/
   function<StateVector(StateVector)> calculateJacobians = [Ts] (StateVector x) {
     StateVector j;
     double Om = x(4), xDot = x(1), yDot = x(3);// omega, x derivative, y derivative
     double c = cos(Om*Ts), s = sin(Om*Ts);
     j(0) = (c*Ts*xDot/Om) - (s*xDot/(Om*Om)) - (s*Ts*yDot/Om) - ((-1+c)*yDot/(Om*Om));
     j(1) = -s*Ts*xDot - c*Ts*yDot;
-    j(2) = (s*Ts*xDot/Om) - ((1-c)*xDot/(Om*Om)) - (c*Ts*yDot/Om) - (s*yDot/(Om*Om));
+    j(2) = (s*Ts*xDot/Om) - ((1-c)*xDot/(Om*Om)) + (c*Ts*yDot/Om) - (s*yDot/(Om*Om));
     j(3) = c*Ts*xDot - s*Ts*yDot;
     j(4) = 1;
     return j;
   };
+/*generateSystemMatrix - CHECKED GOOD*/
   function<SystemMatrix(StateVector)> generateSystemMatrix = [=] (StateVector x) mutable {
     double Om = x(4);//Omega
     if(abs(Om)>.001) {
       double s = sin (Om*Ts), c = cos(Om*Ts);//omega, and the trig terms
       StateVector j = calculateJacobians(x);
-      F <<1, s/Om,        0, (1-c)/Om, j(0),
-          0, c,           0, -s,       j(1),
-          0, (1-c)/Om,    1, s/Om,     j(2),
-          0, s,           0, c,        j(3),
-          0, 0,           0, 0,        1;
+      F <<1, s/Om,        0, -(1-c)/Om, j(0),
+          0, c,           0, -s,        j(1),
+          0, (1-c)/Om,    1, s/Om,      j(2),
+          0, s,           0, c,         j(3),
+          0, 0,           0, 0,         1;
     }
     else {
       double xDot = x(1), yDot = x(3);
       F << 1, Ts, 0, 0,  -0.5*Ts*Ts*yDot,
            0, 1,  0, 0,  -Ts*yDot,
-           0, 0,  1, Ts, -0.5*Ts*Ts*xDot,
+           0, 0,  1, Ts, 0.5*Ts*Ts*xDot,
            0, 0,  0, 1,  Ts*xDot,
            0, 0,  0, 0,  1;
     }
     return F;
   };
+/*predictState - CHECKED GOOD*/
   function<StateVector(StateVector)> predictState = [=] (StateVector x) mutable{
     ProcessNoiseVector sigmaV;
     double Om = x(4);
     if(abs(Om)>.001) {//don't use the limiting form!
       double s = sin (Om*Ts), c = cos(Om*Ts);//omega, and the trig terms
-      F <<1, s/Om,     0, (1-c)/Om, 0,
-          0, c,           0, -s,          0,
-          0, (1-c)/Om, 1, s/Om,     0,
-          0, s,           0, c,           0,
-          0, 0,           0, 0,           Ts;
+      F <<1, s/Om,     0, -(1-c)/Om, 0,
+          0, c,           0, -s,     0,
+          0, (1-c)/Om, 1, s/Om,      0,
+          0, s,           0, c,      0,
+          0, 0,           0, 0,      Ts;
     }
     sigmaV<< noiseX(generatorX), noiseY(generatorY), noiseOm(generatorOm);
     return F*x + Gamma*sigmaV;
@@ -165,8 +168,8 @@ int main() {
        0, 1, 0,
        0, 0, 0;//sigma v
   KalmanFilter kf1 = setupKalmanFilter(sensorState,Ts,V1);
-  V2<< 1, 0, 0,
-       0, 1, 0,
+  V2<< 1.2, 0, 0,
+       0, 1.2, 0,
        0, 0, .08;
   ExtendedKalmanFilter ekf1 = setupExtendedKalmanFilter(sensorState,Ts,V2);
 
