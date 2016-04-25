@@ -21,6 +21,8 @@ class IMM {
   void CalculateMixingProbabilities();
   void CalculateNormalizingConstants();
   void Mix();
+  void MixStateEstimates();
+  void MixStateCovarianceEstimates();
   void GetLikelihoods(MeasurementVector z);
   void UpdateModeProbabilities();
   void Estimate();

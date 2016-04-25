@@ -145,8 +145,8 @@ int main() {
   }
 
   /*Generate Data */
-  cout << "Generating data in file " << filename<<endl;
-  EstimationTPDataGenerator generator(configID,filename);
+  /*cout << "Generating data in file " << filename<<endl;
+  EstimationTPDataGenerator generator(configID,filename);*/
 
   /*Make the target*/
   Target target(filename);//instantiate the target
@@ -192,7 +192,7 @@ int main() {
   kf1.Initialize(z0,z1);
   ekf1.Initialize(z0,z1);
   IMM imm(kf1,ekf1);
-  for(int i = 0;i<48;i++) {
+  for(int i = 0;i<47;i++) {
     z1(0) = range.Measure(target);
     z1(1) = azimuth.Measure(target);
     imm.Update(z1);

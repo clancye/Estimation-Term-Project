@@ -31,7 +31,7 @@ pair<StateVector,StateCovarianceMatrix> IMM::Update(MeasurementVector z) {
   Estimate();
   return make_pair(_x,_P);
 };
-
+/*WORKS*/
 void IMM::CalculateNormalizingConstants() {
   _c<<0,0;
   for(int j = 0;j<NUM_FILTERS;j++) {
@@ -40,7 +40,7 @@ void IMM::CalculateNormalizingConstants() {
     }
   }
 }
-
+/*WORKS*/
 void IMM::CalculateMixingProbabilities() {
   CalculateNormalizingConstants();
   for(int i = 0;i<NUM_FILTERS;i++) {
@@ -48,8 +48,9 @@ void IMM::CalculateMixingProbabilities() {
       _muMix(i,j) = _p(i,j)*_muMode(i)/_c(j);
     }
   }
+  cout<<"_muMix = "<<_muMix<<endl;
 }
-
+/*WORKS*/
 void IMM::Mix() {
   for(int i = 0;i<NUM_FILTERS;i++) {
     _mixed[i].first <<0,0,0,0,0;
@@ -59,14 +60,29 @@ void IMM::Mix() {
                       0,0,0,0,0,
                       0,0,0,0,0;
   }
+  MixStateEstimates();
+  MixStateCovarianceEstimates();
+  for(int j = 0;j<NUM_FILTERS;j++) {
+      _filters[j].Reinitialize(_mixed[j]);
+  }
+}
+/*WORKS*/
+void IMM::MixStateEstimates() {
   for(int j = 0;j<NUM_FILTERS;j++) {
     for(int i = 0;i<NUM_FILTERS;i++) {
       StateVector xi = _filters[i].GetEstimate().first;
       _mixed[j].first += xi*_muMix(i,j);
+    }
+  }
+}
+/*WORKS*/
+void IMM::MixStateCovarianceEstimates() {
+  for(int j = 0;j<NUM_FILTERS;j++) {
+    for(int i = 0;i<NUM_FILTERS;i++) {
+      StateVector xi = _filters[i].GetEstimate().first;
       StateCovarianceMatrix Pi = _filters[i].GetEstimate().second;
       StateVector temp = xi - _mixed[j].first;
       _mixed[j].second += _muMix(i,j)*(Pi+temp*temp.transpose());
-      _filters[j].Reinitialize(_mixed[j]);
     }
   }
 }
