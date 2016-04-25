@@ -11,6 +11,7 @@
 #include <fstream>
 #include <random>
 #include <cmath>
+#include <algorithm>
 
 #include "include/EstimationTPTypeDefinitions.h"
 #include "include/KalmanFilter.h"

@@ -48,7 +48,6 @@ void IMM::CalculateMixingProbabilities() {
       _muMix(i,j) = _p(i,j)*_muMode(i)/_c(j);
     }
   }
-  cout<<"_muMix = "<<_muMix<<endl;
 }
 /*WORKS*/
 void IMM::Mix() {
@@ -121,6 +120,50 @@ void IMM::Estimate() {
     StateCovarianceMatrix Pi = _filters[i].GetEstimate().second;
     _P += _muMode(i)*(Pi+temp*temp.transpose());
   }
+}
+
+double IMM::GetNORXE(StateVector x) {
+  double xSquig = x(0)-_x(0);
+  xSquig = xSquig/sqrt(_P(0,0));
+  return xSquig;
+}
+
+double IMM::GetFPOS() {
+  return _P(0,0)+_P(2,2);
+}
+
+double IMM::GetFVEL() {
+  return _P(1,1)+_P(3,3);
+}
+
+double IMM::GetSPOS(StateVector x) {
+  return pow(_x(0)-x(0)+_x(2)-x(2),2);
+}
+
+double IMM::GetSVEL(StateVector x) {
+  return pow(_x(1)-x(1)+_x(3)-x(3),2);
+}
+
+double IMM::GetSSPD(StateVector x) {
+  double xspd = sqrt(x(1)*x(1) + x(3)*x(3));
+  double _xspd = sqrt(_x(1)*_x(1) + _x(3)*_x(3));
+  return pow(xspd - _xspd,2);
+}
+
+double IMM::GetSCRS(StateVector x) {
+  double xcrs = atan2(x(3),x(1));
+  double _xcrs = atan2(_x(3),_x(1));
+  return pow(xcrs - _xcrs,2);
+}
+
+double IMM::GetNEES(StateVector x) {
+  StateVector xSquig = x-_x;
+  double NEES = xSquig.transpose()*_P.inverse()*xSquig;
+  return NEES;
+}
+
+double IMM::GetMOD2PR() {
+  return _muMode(1);
 }
 
 ofstream& operator<<(ofstream& of,  const IMM& imm) {

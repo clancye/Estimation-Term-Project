@@ -30,6 +30,16 @@ class IMM {
   IMM(KalmanFilter f1, KalmanFilter f2);
 
   pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector z);
+
+  double GetNORXE(StateVector x);
+  double GetFPOS();
+  double GetFVEL();
+  double GetSPOS(StateVector x);
+  double GetSVEL(StateVector x);
+  double GetSSPD(StateVector x);
+  double GetSCRS(StateVector x);
+  double GetNEES(StateVector x);
+  double GetMOD2PR();
   friend ofstream& operator<<(ofstream& of,const IMM& imm);
 };
 

@@ -13,6 +13,9 @@ using namespace Eigen;
 #define  NUM_STATES  5
 #define  NUM_MEASUREMENTS  2
 #define  NUM_PROCESS_NOISES  3
+#define NUM_TRIALS 1.0
+#define NUM_STEPS 50
+#define NUM_SAMPLES 48.0
 
 typedef double DataType;
 typedef double TimeType;

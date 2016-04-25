@@ -106,11 +106,9 @@ void KalmanFilter::Reinitialize(pair<StateVector,StateCovarianceMatrix> params) 
 
 double KalmanFilter::GetLikelihood() {
   MeasurementCovarianceMatrix tempMatrix = 2.0*3.14159265358979*_S;//
-  cout<<"TEMPMATRIX = "<<tempMatrix<<endl;
   double exponent;
   exponent = _v.transpose()*_S.inverse()*_v;
   double Lambda = exp(-0.5*exponent);//sqrt(tempMatrix.determinant());
-  cout<<"Lambda = "<<Lambda<<endl;
   return Lambda;
 }
 
