@@ -7,6 +7,17 @@
 IMM::IMM(KalmanFilter f1, KalmanFilter f2){
   _filters.push_back(f1);
   _filters.push_back(f2);
+  StateVector x;
+  StateCovarianceMatrix P;
+  x<< 0,0,0,0,0;
+  P<<0,0,0,0,0,
+     0,0,0,0,0,
+     0,0,0,0,0,
+     0,0,0,0,0,
+     0,0,0,0,0;
+  auto aPair = make_pair(x,P);
+  _mixed.push_back(aPair);
+  _mixed.push_back(aPair);
   _p<<.9,.1,
       .1,.9;
   _muMode<<.5,.5;
@@ -40,6 +51,14 @@ void IMM::CalculateMixingProbabilities() {
 }
 
 void IMM::Mix() {
+  for(int i = 0;i<NUM_FILTERS;i++) {
+    _mixed[i].first <<0,0,0,0,0;
+    _mixed[i].second<<0,0,0,0,0,
+                      0,0,0,0,0,
+                      0,0,0,0,0,
+                      0,0,0,0,0,
+                      0,0,0,0,0;
+  }
   for(int j = 0;j<NUM_FILTERS;j++) {
     for(int i = 0;i<NUM_FILTERS;i++) {
       StateVector xi = _filters[i].GetEstimate().first;
@@ -61,7 +80,7 @@ void IMM::GetLikelihoods(MeasurementVector z) {
 }
 
 void IMM::UpdateModeProbabilities() {
-  double c;
+  double c = 0;
   for(int j = 0;j<NUM_FILTERS;j++) {
     c += _Lambda(j)*_c(j);
   }
@@ -87,4 +106,13 @@ void IMM::Estimate() {
     StateCovarianceMatrix Pi = _filters[i].GetEstimate().second;
     _P += _muMode(i)*(Pi+temp*temp.transpose());
   }
+}
+
+ofstream& operator<<(ofstream& of,  const IMM& imm) {
+  IOFormat myFormat(StreamPrecision, 0, ", ", ",", "", "", "", "");//Formatting for outputting Eigen matrix
+  //of << "t = "<<filter._t<<endl;
+  of <<imm._muMode.format(myFormat)<<endl;
+  //of << "P = "<<filter._P.format(OctaveFmt)<<endl;
+  //of << "W = "<<filter._W.format(OctaveFmt)<<endl;
+  return of;
 }

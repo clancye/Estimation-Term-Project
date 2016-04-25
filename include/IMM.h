@@ -28,6 +28,7 @@ class IMM {
   IMM(KalmanFilter f1, KalmanFilter f2);
 
   pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector z);
+  friend ofstream& operator<<(ofstream& of,const IMM& imm);
 };
 
 

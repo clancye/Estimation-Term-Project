@@ -185,23 +185,21 @@ int main() {
   target.Advance(10);
 
 
-  ofstream exampleKFData(path+"exampleKFData.txt");
-  ofstream exampleEKFData(path+"exampleEKFData.txt");
+  ofstream KFData(path+"exampleKFData.txt");
+  ofstream EKFData(path+"exampleEKFData.txt");
+  ofstream immData(path+"imm.txt");
   ofstream measurements(path+"measurements.txt");
   kf1.Initialize(z0,z1);
   ekf1.Initialize(z0,z1);
+  IMM imm(kf1,ekf1);
   for(int i = 0;i<48;i++) {
     z1(0) = range.Measure(target);
     z1(1) = azimuth.Measure(target);
-    measurements<<z1(0)*cos(z1(1))-10000<<","<<z1(0)*sin(z1(1))<<endl;
-    kf1.Update(z1);
-    ekf1.Update(z1);
-    exampleKFData<<kf1;
-    exampleEKFData <<ekf1;
+    imm.Update(z1);
+    immData<<imm;
     target.Advance(10);
   }
-  exampleKFData.close();
-  exampleEKFData.close();
+  immData.close();
   measurements.close();
 
 

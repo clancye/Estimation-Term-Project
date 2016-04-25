@@ -100,6 +100,7 @@ double KalmanFilter::GetLikelihood() {
   double exponent;
   exponent = _v.transpose()*_S.inverse()*_v;
   double Lambda = exp(-0.5*exponent)/sqrt(tempMatrix.determinant());
+  cout<<"Lambda = "<<Lambda<<endl;
   return Lambda;
 }
 

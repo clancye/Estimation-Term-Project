@@ -15,6 +15,7 @@
 #include "include/EstimationTPTypeDefinitions.h"
 #include "include/KalmanFilter.h"
 #include "include/ExtendedKalmanFilter.h"
+#include "include/IMM.h"
 #include "include/Target.h"
 #include "include/EstimationTPDataGenerator.h"
 #include "include/RangeSensor.h"
