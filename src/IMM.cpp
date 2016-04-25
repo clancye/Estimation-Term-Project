@@ -88,9 +88,8 @@ void IMM::MixStateCovarianceEstimates() {
 }
 
 void IMM::GetLikelihoods(MeasurementVector z) {
-  for(auto x:_filters)
-    x.Update(z);
   for(int i = 0;i<NUM_FILTERS;i++){
+    _filters[i].Update(z);
     _Lambda(i) = _filters[i].GetLikelihood();
   }
 }
