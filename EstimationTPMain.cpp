@@ -171,9 +171,9 @@ int main() {
        0, .1, 0,
        0, 0, 0;//sigma v
   KalmanFilter kf1 = setupKalmanFilter(sensorState,Ts,V1, sigmaR,sigmaTheta);
-  V2<< .8, 0, 0,
-       0, .8, 0,
-       0, 0, .05;
+  V2<< 1.5, 0, 0,
+       0, 1.5, 0,
+       0, 0, .001;
   ExtendedKalmanFilter ekf1 = setupExtendedKalmanFilter(sensorState,Ts,V2, sigmaR,sigmaTheta);
 
   MeasurementVector z0,z1;
@@ -185,8 +185,8 @@ int main() {
   target.Advance(10);
 
 
-  ofstream KFData(path+"exampleKFData.txt");
-  ofstream EKFData(path+"exampleEKFData.txt");
+  ofstream KFData(path+"KFData.txt");
+  ofstream EKFData(path+"EKFData.txt");
   ofstream immData(path+"imm.txt");
   ofstream measurements(path+"measurements.txt");
   kf1.Initialize(z0,z1);
@@ -195,11 +195,18 @@ int main() {
   for(int i = 0;i<47;i++) {
     z1(0) = range.Measure(target);
     z1(1) = azimuth.Measure(target);
-    imm.Update(z1);
-    immData<<imm;
+    measurements<<z1(0)*cos(z1(1))-10000<<","<<z1(0)*sin(z1(1))<<endl;
+    kf1.Update(z1);
+    ekf1.Update(z1);
+    KFData<<kf1;
+    EKFData<<ekf1;
+    //imm.Update(z1);
+    //immData<<imm;
     target.Advance(10);
   }
   immData.close();
+  KFData.close();
+  EKFData.close();
   measurements.close();
 
 
