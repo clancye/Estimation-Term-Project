@@ -9,6 +9,8 @@
 #include "KalmanFilter.h"
 
 class IMM {
+  StateVector _x;
+  StateCovarianceMatrix _P;
   TransitionMatrix _p;
   MixProbabilityMatrix _muMix;
   vector<KalmanFilter> _filters;
@@ -19,9 +21,13 @@ class IMM {
   void CalculateMixingProbabilities();
   void CalculateNormalizingConstants();
   void Mix();
-  void GetLikelihoods();
+  void GetLikelihoods(MeasurementVector z);
+  void UpdateModeProbabilities();
+  void Estimate();
   public:
   IMM(KalmanFilter f1, KalmanFilter f2);
+
+  pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector z);
 };
 
 

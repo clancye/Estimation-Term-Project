@@ -12,6 +12,15 @@ IMM::IMM(KalmanFilter f1, KalmanFilter f2){
   _muMode<<.5,.5;
 }
 
+pair<StateVector,StateCovarianceMatrix> IMM::Update(MeasurementVector z) {
+  CalculateMixingProbabilities();
+  Mix();
+  GetLikelihoods(z);
+  UpdateModeProbabilities();
+  Estimate();
+  return make_pair(_x,_P);
+};
+
 void IMM::CalculateNormalizingConstants() {
   _c<<0,0;
   for(int j = 0;j<NUM_FILTERS;j++) {
@@ -43,8 +52,39 @@ void IMM::Mix() {
   }
 }
 
-void IMM::GetLikelihoods() {
+void IMM::GetLikelihoods(MeasurementVector z) {
+  for(auto x:_filters)
+    x.Update(z);
   for(int i = 0;i<NUM_FILTERS;i++){
-    _Lambda(i) = _filters(i).GetLikelihood();
+    _Lambda(i) = _filters[i].GetLikelihood();
+  }
+}
+
+void IMM::UpdateModeProbabilities() {
+  double c;
+  for(int j = 0;j<NUM_FILTERS;j++) {
+    c += _Lambda(j)*_c(j);
+  }
+  for(int i = 0;i<NUM_FILTERS;i++) {
+    _muMode(i) = _Lambda(i)*_c(i)/c;
+  }
+}
+
+void IMM::Estimate() {
+  _x<<0,0,0,0,0;
+  _P<<0,0,0,0,0,
+  0,0,0,0,0,
+  0,0,0,0,0,
+  0,0,0,0,0,
+  0,0,0,0,0;
+  for(int i = 0;i<NUM_FILTERS;i++) {
+    StateVector xi = _filters[i].GetEstimate().first;
+    _x += xi*_muMode(i);
+  }
+  for(int i = 0;i<NUM_FILTERS;i++) {
+    StateVector xi = _filters[i].GetEstimate().first;
+    StateVector temp = xi - _x;
+    StateCovarianceMatrix Pi = _filters[i].GetEstimate().second;
+    _P += _muMode(i)*(Pi+temp*temp.transpose());
   }
 }

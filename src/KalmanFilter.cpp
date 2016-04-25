@@ -96,7 +96,11 @@ void KalmanFilter::Reinitialize(pair<StateVector,StateCovarianceMatrix> params) 
 }
 
 double KalmanFilter::GetLikelihood() {
-  StateCovarianceMatrix tempMatrix = 2*3.14159265358979*_S;
+  MeasurementCovarianceMatrix tempMatrix = 2*3.14159265358979*_S;
+  double exponent;
+  exponent = _v.transpose()*_S.inverse()*_v;
+  double Lambda = exp(-0.5*exponent)/sqrt(tempMatrix.determinant());
+  return Lambda;
 }
 
 ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
