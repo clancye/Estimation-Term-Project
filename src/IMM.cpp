@@ -18,8 +18,8 @@ IMM::IMM(KalmanFilter f1, KalmanFilter f2){
   auto aPair = make_pair(x,P);
   _mixed.push_back(aPair);
   _mixed.push_back(aPair);
-  _p<<.9,.1,
-      .1,.9;
+  _p<<.95,.05,
+      .05,.95;
   _muMode<<.5,.5;
 }
 
@@ -126,7 +126,7 @@ void IMM::Estimate() {
 ofstream& operator<<(ofstream& of,  const IMM& imm) {
   IOFormat myFormat(StreamPrecision, 0, ", ", ",", "", "", "", "");//Formatting for outputting Eigen matrix
   //of << "t = "<<filter._t<<endl;
-  of <<imm._muMode.format(myFormat)<<endl;
+  of <<imm._x.format(myFormat)<<endl;
   //of << "P = "<<filter._P.format(OctaveFmt)<<endl;
   //of << "W = "<<filter._W.format(OctaveFmt)<<endl;
   return of;
