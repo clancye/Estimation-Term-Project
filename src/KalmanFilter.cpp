@@ -60,14 +60,23 @@ pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector m
 MeasurementVector KalmanFilter::ConvertToCartesian(MeasurementVector z) {
   MeasurementVector z1;
   double r = z(0), theta = z(1);
+  double s = sin(theta), c = cos(theta), c2 = cos(2*theta), s2 = sin(2*theta);
+  double sigRSquared = _sigmaR*_sigmaR, sigThetaSquared = _sigmaTheta*_sigmaTheta;
   if((r*_validityConstant)>0.4) {//debiasing
     double b1 = exp(-(_sigmaTheta*_sigmaTheta)/2);
+    double b2 = b1*b1*b1*b1;
     z1(0) = r*cos(theta)/b1 + _sensorState(0);
     z1(1) = r*sin(theta)/b1 + _sensorState(2);
+    _R(0,0) = (1/(b1*b1) -2)*r*r*c*c + (r*r + sigRSquared)*.5*(1+b2*c2);
+    _R(1,1) = (1/(b1*b1) -2)*r*r*s*s + (r*r + sigRSquared)*.5*(1-b2*c2);
+    _R(0,1) = _R(1,0) = (r*r/(2*b1*b1) + (r*r + sigRSquared)*b2/2 - r*r)*s2;
   }
   else {
     z1(0) = r * cos(theta) + _sensorState(0);
     z1(1) = r * sin(theta) + _sensorState(2);
+    _R(0,0) = r*r*sigThetaSquared*s*s + sigRSquared*c*c;
+    _R(1,1) = r*r*sigThetaSquared*c*c + sigRSquared*s*s;
+    _R(0,1) = _R(1,0) = (sigRSquared-r*r*sigThetaSquared)*s*c;
   }
   return z1;
 }
@@ -97,9 +106,10 @@ void KalmanFilter::Reinitialize(pair<StateVector,StateCovarianceMatrix> params) 
 
 double KalmanFilter::GetLikelihood() {
   MeasurementCovarianceMatrix tempMatrix = 2.0*3.14159265358979*_S;//
+  cout<<"TEMPMATRIX = "<<tempMatrix<<endl;
   double exponent;
   exponent = _v.transpose()*_S.inverse()*_v;
-  double Lambda = exp(-0.5*exponent)/sqrt(tempMatrix.determinant());
+  double Lambda = exp(-0.5*exponent);//sqrt(tempMatrix.determinant());
   cout<<"Lambda = "<<Lambda<<endl;
   return Lambda;
 }
