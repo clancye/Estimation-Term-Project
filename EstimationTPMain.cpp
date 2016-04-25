@@ -167,13 +167,13 @@ int main() {
   /* Make the Kalman Filter*/
   VProcessNoiseGainMatrix V1,V2;
   TimeType Ts = 10;
-  V1 << .1, 0, 0,
-       0, .1, 0,
+  V1 << .07, 0, 0,
+       0, .07, 0,
        0, 0, 0;//sigma v
   KalmanFilter kf1 = setupKalmanFilter(sensorState,Ts,V1, sigmaR,sigmaTheta);
-  V2<< .5, 0, 0,
-       0, .5, 0,
-       0, 0, .001;
+  V2<< .7, 0, 0,
+       0, .7, 0,
+       0, 0, .01;
   ExtendedKalmanFilter ekf1 = setupExtendedKalmanFilter(sensorState,Ts,V2, sigmaR,sigmaTheta);
 
   MeasurementVector z0,z1;
