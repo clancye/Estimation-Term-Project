@@ -7,6 +7,8 @@
 KalmanFilter::KalmanFilter(){ }
 
 KalmanFilter::KalmanFilter(StateVector sensorState,
+                          double sigmaR,
+                          double sigmaTheta,
                           TimeType Ts,
                           function<SystemMatrix(StateVector)> generateSystemMatrix,
                           MeasurementCovarianceMatrix R,
@@ -14,17 +16,21 @@ KalmanFilter::KalmanFilter(StateVector sensorState,
                           ProcessNoiseCovarianceMatrix Q,
                           function<StateVector(StateVector)> predictState):
                             _sensorState(sensorState),
+                            _sigmaR(sigmaR),
+                            _sigmaTheta(sigmaTheta),
                             _Ts(Ts),
                             _generateSystemMatrix(generateSystemMatrix),
                             _R(R),
                             _H(H),
                             _Q(Q),
-                            _predictState(predictState){ }
+                            _predictState(predictState){
+  _validityConstant = sigmaTheta*sigmaTheta/sigmaR;
+  _initialR = _R;
+}
 
 void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
   z0 = ConvertToCartesian(z0);
   z1 = ConvertToCartesian(z1);
-  cout<<"z0 = "<<z0<<endl<<"z1 = "<<z1<<endl;
   _x(0) = z1(0);//x position
   double xDot = (z1(0)-z0(0))/_Ts;
   _x(1) = xDot; //x speed
@@ -35,11 +41,10 @@ void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
   double Rx = _R(0,0);
   double Ry = _R(1,1);
   _P<< Rx,     Rx/_Ts,         0,      0,              0,
-          Rx/_Ts, 2*Rx/(_Ts*_Ts), 0,      0,              0,
-          0,      0,              Ry,     Ry/_Ts,         0,
-          0,      0,              Ry/_Ts, 2*Ry/(_Ts*_Ts), 0,
-          0,      0,              0,      0,              0;
-  cout <<"_x = "<<_x<<endl<<endl<<"_P = "<<_P<<endl;
+       Rx/_Ts, 2*Rx/(_Ts*_Ts), 0,      0,              0,
+       0,      0,              Ry,     Ry/_Ts,         0,
+       0,      0,              Ry/_Ts, 2*Ry/(_Ts*_Ts), 0,
+       0,      0,              0,      0,              Rx;
 }
 
 pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector measurement) {
@@ -55,8 +60,15 @@ pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector m
 MeasurementVector KalmanFilter::ConvertToCartesian(MeasurementVector z) {
   MeasurementVector z1;
   double r = z(0), theta = z(1);
-  z1(0) = r*cos(theta) + _sensorState(0);
-  z1(1) = r*sin(theta) + _sensorState(2);
+  if((r*_validityConstant)>0.4) {//debiasing
+    double b1 = exp(-(_sigmaTheta*_sigmaTheta)/2);
+    z1(0) = r*cos(theta)/b1 + _sensorState(0);
+    z1(1) = r*sin(theta)/b1 + _sensorState(2);
+  }
+  else {
+    z1(0) = r * cos(theta) + _sensorState(0);
+    z1(1) = r * sin(theta) + _sensorState(2);
+  }
   return z1;
 }
 

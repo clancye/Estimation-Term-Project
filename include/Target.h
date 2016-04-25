@@ -22,7 +22,6 @@ class Target {
   Target(string dataFile);
   ~Target() {
     _data.close();
-    Print("Deleting target");
   }
   void Advance(int times = 1);
   StateVector Sample();

@@ -19,6 +19,7 @@ using namespace std;
 class KalmanFilter {
   protected:
   StateVector _sensorState;
+  double _validityConstant,_sigmaR, _sigmaTheta;
   TimeType _Ts;//sampling time
   volatile int _t = 0;//actual time in units in which the system advances
 
@@ -29,7 +30,7 @@ class KalmanFilter {
   SystemMatrix _F;//system matrix
   ProcessNoiseVector _processNoise;
   ProcessNoiseCovarianceMatrix _Q;//noise covariance
-  MeasurementCovarianceMatrix _R;//measurement covariance
+  MeasurementCovarianceMatrix _R,_initialR;//measurement covariance
   MeasurementMatrix _H;//measurement matrix
   MeasurementCovarianceMatrix _S;//measurement prediction covariance
   function<StateVector(StateVector)> _predictState;
@@ -42,6 +43,8 @@ class KalmanFilter {
   public:
   KalmanFilter();
   KalmanFilter(StateVector sensorState,
+              double sigmaR,
+              double sigmaTheta,
               TimeType Ts,
               function<SystemMatrix(StateVector)> generateSystemMatrix,
               MeasurementCovarianceMatrix R,

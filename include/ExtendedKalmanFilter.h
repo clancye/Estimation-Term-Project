@@ -11,6 +11,8 @@ class ExtendedKalmanFilter : public KalmanFilter {
   public:
   ExtendedKalmanFilter();
   ExtendedKalmanFilter(StateVector sensorState,
+                      double sigmaR,
+                      double sigmaTheta,
                       TimeType Ts,
                       function<SystemMatrix(StateVector)> generateSystemMatrix,
                       MeasurementCovarianceMatrix R,

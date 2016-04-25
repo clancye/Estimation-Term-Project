@@ -9,7 +9,7 @@
 
 class RangeSensor : public Sensor {
   public:
-  RangeSensor(StateVector sensorState, double mean, double variance):Sensor(sensorState,mean,variance){}
+  RangeSensor(StateVector sensorState, double mean, double stddev):Sensor(sensorState,mean,stddev){}
   double Measure(Target& aTarget);
 };
 
