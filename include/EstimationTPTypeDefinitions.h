@@ -28,6 +28,10 @@ typedef Matrix<DataType, NUM_STATES, NUM_MEASUREMENTS> GainMatrix;
 typedef Matrix<DataType, NUM_STATES,NUM_PROCESS_NOISES> NoiseGainMatrix;
 typedef Matrix<DataType, NUM_PROCESS_NOISES,NUM_PROCESS_NOISES> VProcessNoiseGainMatrix;
 typedef Matrix<DataType, NUM_PROCESS_NOISES,1> ProcessNoiseVector;
+typedef Matrix<DataType, NUM_FILTERS, NUM_FILTERS> TransitionMatrix;
+typedef Matrix<DataType, NUM_FILTERS,NUM_FILTERS> MixProbabilityMatrix;
+typedef Matrix<DataType, NUM_FILTERS,1> ModeProbabilityVector;
+typedef Matrix<DataType, NUM_FILTERS,1> LikelihoodVector;
 
 
 

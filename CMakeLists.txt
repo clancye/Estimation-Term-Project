@@ -8,6 +8,7 @@ set(SOURCE_FILES
         include/EstimationTPTypeDefinitions.h
         src/KalmanFilter.cpp include/KalmanFilter.h
         src/ExtendedKalmanFilter.cpp include/ExtendedKalmanFilter.h
+        src/IMM.cpp include/IMM.h
         src/Target.cpp include/Target.h
         src/EstimationTPDataGenerator.cpp include/EstimationTPDataGenerator.h
         include/Sensor.h

@@ -54,6 +54,9 @@ class KalmanFilter {
 
   virtual pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector measurement);
   void Initialize(MeasurementVector z0,MeasurementVector z1);
+  pair<StateVector,StateCovarianceMatrix> GetEstimate();
+  void Reinitialize(pair<StateVector,StateCovarianceMatrix> params);
+  double GetLikelihood();
   friend ofstream& operator<<(ofstream& of,const KalmanFilter& kf);
 
 };

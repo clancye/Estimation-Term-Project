@@ -86,6 +86,19 @@ void KalmanFilter::UpdateStateEstimate(MeasurementVector z) {
   _x = _x + _W*_v;
 }
 
+pair<StateVector,StateCovarianceMatrix> KalmanFilter::GetEstimate() {
+  return make_pair(_x,_P);
+};
+
+void KalmanFilter::Reinitialize(pair<StateVector,StateCovarianceMatrix> params) {
+  _x = params.first;
+  _P = params.second;
+}
+
+double KalmanFilter::GetLikelihood() {
+  StateCovarianceMatrix tempMatrix = 2*3.14159265358979*_S;
+}
+
 ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
   IOFormat myFormat(StreamPrecision, 0, ", ", ",", "", "", "", "");//Formatting for outputting Eigen matrix
   //of << "t = "<<filter._t<<endl;
