@@ -21,5 +21,6 @@
 #include "include/EstimationTPDataGenerator.h"
 #include "include/RangeSensor.h"
 #include "include/AzimuthSensor.h"
+#include "include/PerformanceEvaluator.h"
 
 #endif //ESTIMATION_PROJECT_2016_ESTIMATIONTPMAIN_H

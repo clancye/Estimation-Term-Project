@@ -37,7 +37,7 @@ KalmanFilter setupKalmanFilter(StateVector sensorState, TimeType Ts, VProcessNoi
   H << 1, 0, 0, 0, 0,
        0, 0, 1, 0, 0;
   R<<sigmaR*sigmaR, 0,
-     0,    sigmaTheta*sigmaTheta;//.0003046 is 1 degree squared in radians
+     0,    sigmaTheta*sigmaTheta;
 
   KalmanFilter myFilter(sensorState, sigmaR, sigmaTheta, Ts, generateSystemMatrix, R, H, Q,predictState);
 
@@ -133,7 +133,7 @@ double average(vector<double> vec) {
 
 int main() {
   cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
-  string dataset,filename, configID, path="/home/clancy/Projects/Estimation Project 2016/";
+  string dataset,filename, configID,performance, path="/home/clancy/Projects/Estimation Project 2016/";
   cin >> dataset;
   if(dataset == "1") {
     filename = path + "Term Project Data.txt";
@@ -173,15 +173,18 @@ int main() {
   V1 << .2, 0, 0,
        0, .2, 0,
        0, 0, 0;//sigma v
-  V2 << 1.6, 0, 0,
-          0, 1.6, 0,
+  V2 << 7, 0, 0,
+          0, 7, 0,
           0, 0, 0;//sigma v
-  V3<<1.6, 0, 0,
-      0, 1.6, 0,
-      0, 0, .005;
+  V3<<1, 0, 0,
+      0, 1, 0,
+      0, 0, .03;
 
   vector<double> NORXE_v, FPOS_v, FVEL_v, RMSPOS_v, RMSVEL_v, RMSSPD_v, RMSCRS_v, NEES_v, MOD2PR_v;
   StateVector x;
+
+  performance = path+"performance.txt";
+  PerformanceEvaluator pe(performance);
 
   for(int j = 0;j<NUM_TRIALS;j++) {
 
@@ -219,6 +222,7 @@ int main() {
       immCTData<<immCT;
       immLData<<immL;
       kfData<<kf2;
+      pe.Evaluate(immCT.GetEstimate(),target.Sample());
       /*NORXE += imm.GetNORXE(x);
       FPOS += imm.GetFPOS();
       FVEL += imm.GetFVEL();

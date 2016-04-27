@@ -30,6 +30,10 @@ pair<StateVector,StateCovarianceMatrix> IMM::Update(MeasurementVector z) {
   UpdateModeProbabilities();
   Estimate();
   return make_pair(_x,_P);
+}
+
+pair<StateVector,StateCovarianceMatrix> IMM::GetEstimate() {
+  return make_pair(_x,_P);
 };
 /*WORKS*/
 void IMM::CalculateNormalizingConstants() {

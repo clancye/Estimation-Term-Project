@@ -30,6 +30,7 @@ class IMM {
   IMM(KalmanFilter f1, KalmanFilter f2);
 
   pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector z);
+  pair<StateVector,StateCovarianceMatrix> GetEstimate();
 
   double GetNORXE(StateVector x);
   double GetFPOS();

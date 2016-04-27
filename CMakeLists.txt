@@ -13,5 +13,6 @@ set(SOURCE_FILES
         src/EstimationTPDataGenerator.cpp include/EstimationTPDataGenerator.h
         include/Sensor.h
         src/RangeSensor.cpp include/RangeSensor.h
-        src/AzimuthSensor.cpp include/AzimuthSensor.h)
+        src/AzimuthSensor.cpp include/AzimuthSensor.h
+        src/PerformanceEvaluator.cpp include/PerformanceEvaluator.h)
 add_executable(Estimation_Project_2016 ${SOURCE_FILES})
