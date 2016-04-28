@@ -86,9 +86,9 @@ void PerformanceEvaluator::FinishEvaluating() {
     string key = v.first;
     FinishFunction f = get<2>(v.second);
     VecPtr vec = get<0>(v.second);
-    cout<<"START " + key<<endl;
-    cout<<"vec = ";
-    for(auto e:*vec) cout<<e<<endl;
+    //cout<<"START " + key<<endl;
+    //cout<<"vec = ";
+    //for(auto e:*vec) cout<<e<<endl;
     _results[key] = f(vec);
     cout<< key + " = "<<_results[key]<<endl;
     of<<key+"="<<_results[key]<<endl;

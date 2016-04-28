@@ -133,7 +133,7 @@ double average(vector<double> vec) {
 
 int main() {
   cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
-  string dataset,filename, configID,performance, path="/home/clancy/Projects/Estimation Project 2016/", performancePath = path+"Performance Data";
+  string dataset,filename, configID,performance, path="/home/clancy/Projects/Estimation Project 2016/", performancePath = path+"Performance Data/";
   cin >> dataset;
   if(dataset == "1") {
     filename = path + "Term Project Data.txt";
@@ -182,13 +182,13 @@ int main() {
 
   StateVector x;
 
-  performance = performancePath+"performance.txt";
   PerformanceEvaluator pe;
-  pe.SetFilename(performance);
 
   for(int j = 0;j<NUM_TRIALS;j++) {
 
 
+    performance = performancePath+"performance"+to_string(j)+".txt";
+    pe.SetFilename(performance);
     /*Make the target*/
     Target target(filename);//instantiate the target
     KalmanFilter kf1 = setupKalmanFilter(sensorState, Ts, V1, sigmaR, sigmaTheta);
