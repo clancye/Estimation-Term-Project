@@ -34,9 +34,14 @@ class PerformanceEvaluator {
   double CalculateFPOS(SVref xEst,SCMref P,SVref xReal);
   double CalculateFVEL(SVref xEst,SCMref P,SVref xReal);
   double CalculatePOS(SVref xEst,SCMref P,SVref xReal);
-  void CalculatePerformanceValues(SVref xEst, SCMref P, SVref xReal);
-  double CalculateAverage(vector<double> vec);
-  double CalculateRMS(vector<double> vec);
+  double CalculateVEL(SVref xEst,SCMref P,SVref xReal);
+  double CalculateSPD(SVref xEst,SCMref P,SVref xReal);
+  double CalculateCRS(SVref xEst,SCMref P,SVref xReal);
+  double CalculateNEES(SVref xEst,SCMref P,SVref xReal);
+
+  double CalculateAverage(vector<double> vec);//mean
+  double CalculateRMS(vector<double> vec);//root mean square
+  double CalculateRM(vector<double> vec);//root mean
 
   public:
   PerformanceEvaluator(string filename);

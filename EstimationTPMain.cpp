@@ -223,6 +223,7 @@ int main() {
       pe.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
       target.Advance(10);
     }
+    pe.FinishEvaluating();
     immCTData.close();
     immLData.close();
     kfData.close();
