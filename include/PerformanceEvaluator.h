@@ -44,9 +44,11 @@ class PerformanceEvaluator {
   double CalculateRM(VecPtr vec);//root mean
 
   public:
+  PerformanceEvaluator();
   PerformanceEvaluator(string filename);
   void EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate, StateVector xReal);
   void FinishEvaluating();
+  void SetFilename(string filename);
 
 };
 

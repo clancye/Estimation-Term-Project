@@ -4,7 +4,11 @@
 
 #include "../include/PerformanceEvaluator.h"
 
-PerformanceEvaluator::PerformanceEvaluator(string filename):_filename(filename){
+PerformanceEvaluator::PerformanceEvaluator(string filename):PerformanceEvaluator(){
+  SetFilename(filename);
+}
+
+PerformanceEvaluator::PerformanceEvaluator(){
   _performanceValueTuples["NORXE"] = make_tuple(make_shared<vector<double>>(),
                                                 PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
                                                   return CalculateNORXE(xEst,P,xReal);
@@ -77,6 +81,7 @@ void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovariance
 }
 
 void PerformanceEvaluator::FinishEvaluating() {
+  ofstream of(_filename);
   for(auto v:_performanceValueTuples) {
     string key = v.first;
     FinishFunction f = get<2>(v.second);
@@ -86,8 +91,14 @@ void PerformanceEvaluator::FinishEvaluating() {
     for(auto e:*vec) cout<<e<<endl;
     _results[key] = f(vec);
     cout<< key + " = "<<_results[key]<<endl;
+    of<<key+"="<<_results[key]<<endl;
   }
+  of.close();
   _sampleCount = 0;
+}
+
+void PerformanceEvaluator::SetFilename(string filename) {
+  _filename = filename;
 }
 
 double PerformanceEvaluator::CalculateAverage(VecPtr vec) {
