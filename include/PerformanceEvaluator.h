@@ -22,14 +22,14 @@ using namespace std;
 using SVref = StateVector&;
 using SCMref = StateCovarianceMatrix&;
 using PerformanceFunction = function<double(SVref,SCMref,SVref)>;
-using FinishFunction = function<double(vector<double>)>;
+using VecPtr = shared_ptr<vector<double>>;
+using FinishFunction = function<double(VecPtr)>;
 
 class PerformanceEvaluator {
   volatile int _sampleCount = 0;
   string _filename;
-  map<string,tuple<vector<double>,PerformanceFunction,function<double(vector<double>)>>> _performanceValueTuples;
+  map<string,tuple<VecPtr,PerformanceFunction,function<double(VecPtr)>>> _performanceValueTuples;
   map<string,double> _results;
-  void WriteValuesToFile(map<string,double> performanceValues);
   double CalculateNORXE(SVref xEst,SCMref P,SVref xReal);
   double CalculateFPOS(SVref xEst,SCMref P,SVref xReal);
   double CalculateFVEL(SVref xEst,SCMref P,SVref xReal);
@@ -39,9 +39,9 @@ class PerformanceEvaluator {
   double CalculateCRS(SVref xEst,SCMref P,SVref xReal);
   double CalculateNEES(SVref xEst,SCMref P,SVref xReal);
 
-  double CalculateAverage(vector<double> vec);//mean
-  double CalculateRMS(vector<double> vec);//root mean square
-  double CalculateRM(vector<double> vec);//root mean
+  double CalculateAverage(VecPtr vec);//mean
+  double CalculateRMS(VecPtr vec);//root mean square
+  double CalculateRM(VecPtr vec);//root mean
 
   public:
   PerformanceEvaluator(string filename);
