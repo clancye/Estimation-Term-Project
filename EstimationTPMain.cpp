@@ -82,7 +82,7 @@ ExtendedKalmanFilter setupExtendedKalmanFilter(StateVector sensorState, TimeType
 /*generateSystemMatrix - CHECKED GOOD*/
   function<SystemMatrix(StateVector)> generateSystemMatrix = [=] (StateVector x) mutable {
     double Om = x(4);//Omega
-    if(abs(Om)>.05) {
+    if(abs(Om)>.0001) {
       double s = sin (Om*Ts), c = cos(Om*Ts);//omega, and the trig terms
       StateVector j = calculateJacobians(x);
       F <<1, s/Om,        0, -(1-c)/Om, j(0),
@@ -105,7 +105,7 @@ ExtendedKalmanFilter setupExtendedKalmanFilter(StateVector sensorState, TimeType
   function<StateVector(StateVector)> predictState = [=] (StateVector x) mutable{
     ProcessNoiseVector sigmaV;
     double Om = x(4);
-    if(abs(Om)>.05) {//don't use the limiting form!
+    if(abs(Om)>.0001) {//don't use the limiting form!
       double s = sin (Om*Ts), c = cos(Om*Ts);//omega, and the trig terms
       F <<1, s/Om,     0, -(1-c)/Om, 0,
           0, c,        0, -s,        0,
@@ -173,12 +173,12 @@ int main() {
   V1 << .2, 0, 0,
        0, .2, 0,
        0, 0, 0;//sigma v
-  V2 << 7, 0, 0,
-          0, 7, 0,
+  V2 << 6.0, 0, 0,
+          0, 6.0, 0,
           0, 0, 0;//sigma v
-  V3<<1, 0, 0,
-      0, 1, 0,
-      0, 0, .03;
+  V3<<.1, 0, 0,
+      0, .1, 0,
+      0, 0, .001;
 
   StateVector x;
 
@@ -206,6 +206,7 @@ int main() {
     ofstream immCTData(path+"immCT.txt");
     ofstream immLData(path+"immL.txt");
     ofstream kfData(path + "kf.txt");
+    ofstream measurements(path+"measurements.txt");
     kf1.Initialize(z0, z1);
     ekf1.Initialize(z0, z1);
     kf2.Initialize(z0,z1);
@@ -215,13 +216,14 @@ int main() {
       x = target.Sample();
       z1(0) = range.Measure(target);
       z1(1) = azimuth.Measure(target);
+      measurements<<z1(0)*cos(z1(1))-10000<<","<<z1(0)*sin(z1(1))<<endl;
       immCT.Update(z1);
       immL.Update(z1);
       kf2.Update(z1);
       immCTData<<immCT;
       immLData<<immL;
       kfData<<kf2;
-      pe.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
+      pe.EvaluateIntermediate(immL.GetEstimate(),target.Sample());
       target.Advance(10);
     }
     pe.FinishEvaluating();

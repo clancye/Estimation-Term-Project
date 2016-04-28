@@ -86,11 +86,7 @@ void PerformanceEvaluator::FinishEvaluating() {
     string key = v.first;
     FinishFunction f = get<2>(v.second);
     VecPtr vec = get<0>(v.second);
-    //cout<<"START " + key<<endl;
-    //cout<<"vec = ";
-    //for(auto e:*vec) cout<<e<<endl;
     _results[key] = f(vec);
-    cout<< key + " = "<<_results[key]<<endl;
     of<<key+"="<<_results[key]<<endl;
   }
   of.close();
@@ -106,7 +102,9 @@ double PerformanceEvaluator::CalculateAverage(VecPtr vec) {
 }
 
 double PerformanceEvaluator::CalculateRMS(VecPtr vec) {
-  return sqrt(accumulate(vec->begin(),vec->end(),0.0,[](double accum, double x) { return accum + x*x;})/(1.0*_sampleCount));
+  double MS = accumulate(vec->begin(),vec->end(),0.0,[](double accum, double x) { return accum + x*x;})/(1.0*_sampleCount);
+  cout<<"MS =" <<MS<<endl;
+  return sqrt(MS);
 }
 
 double PerformanceEvaluator::CalculateRM(VecPtr vec) {
@@ -142,7 +140,9 @@ double PerformanceEvaluator::CalculateSPD(SVref xEst,SCMref P,SVref xReal) {
 double PerformanceEvaluator::CalculateCRS(SVref xEst,SCMref P,SVref xReal) {
   double CRSEst = atan2(xEst(3),xEst(1));
   double CRSReal = atan2(xReal(3),xReal(1));
-  return CRSReal - CRSEst;
+  double CRSdiff = CRSReal-CRSEst;
+  cout<<"CRSdiff = "<<CRSdiff<<endl;
+  return CRSdiff;
 }
 
 double PerformanceEvaluator::CalculateNEES(SVref xEst,SCMref P,SVref xReal) {

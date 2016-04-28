@@ -12,5 +12,5 @@ plot(immLData(:,1),immLData(:,3),"-g","linewidth",2);
 hold on
 plot(kfData(:,1),kfData(:,3),"c","linewidth",2);
 hold on
-plot(measurements(:,1),measurements(:,2),"-k","linewidth",2);
+plot(measurements(:,1),measurements(:,2),"-ks","linewidth",2);
 

@@ -13,6 +13,7 @@ double RangeSensor::Measure(Target& aTarget) {
       range += pow(_sensorState(i) - targetState(i), 2);
   }
   range = sqrt(range);
-  range += _distribution(_generator);
+  double noise = _distribution(_generator);
+  range += noise;
   return range;
 }
