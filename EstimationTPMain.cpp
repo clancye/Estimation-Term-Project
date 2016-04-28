@@ -180,7 +180,6 @@ int main() {
       0, 1, 0,
       0, 0, .03;
 
-  vector<double> NORXE_v, FPOS_v, FVEL_v, RMSPOS_v, RMSVEL_v, RMSSPD_v, RMSCRS_v, NEES_v, MOD2PR_v;
   StateVector x;
 
   performance = path+"performance.txt";
@@ -188,7 +187,6 @@ int main() {
 
   for(int j = 0;j<NUM_TRIALS;j++) {
 
-    double NORXE = 0, FPOS = 0, FVEL = 0, SPOS = 0, SVEL = 0, SSPD = 0, SCRS = 0, NEES = 0, MOD2PR = 0;
 
     /*Make the target*/
     Target target(filename);//instantiate the target
@@ -222,75 +220,13 @@ int main() {
       immCTData<<immCT;
       immLData<<immL;
       kfData<<kf2;
-      pe.Evaluate(immCT.GetEstimate(),target.Sample());
-      /*NORXE += imm.GetNORXE(x);
-      FPOS += imm.GetFPOS();
-      FVEL += imm.GetFVEL();
-      SPOS += imm.GetSPOS(x);
-      SVEL += imm.GetSVEL(x);
-      SSPD += imm.GetSSPD(x);
-      SCRS += imm.GetSCRS(x);
-      NEES += imm.GetNEES(x);
-      MOD2PR += imm.GetMOD2PR();*/
+      pe.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
       target.Advance(10);
     }
-    NORXE /= NUM_SAMPLES;
-    NORXE_v.push_back(NORXE);
-
-    FPOS /= NUM_SAMPLES;
-    FPOS = sqrt(FPOS);
-    FPOS_v.push_back(FPOS);
-
-    FVEL /= NUM_SAMPLES;
-    FVEL = sqrt(FVEL);
-    FVEL_v.push_back(FVEL);
-
-    SPOS /= NUM_SAMPLES;
-    SPOS = sqrt(SPOS);
-    RMSPOS_v.push_back(SPOS);
-
-    SVEL /= NUM_SAMPLES;
-    SVEL = sqrt(SVEL);
-    RMSVEL_v.push_back(SVEL);
-
-    SSPD /= NUM_SAMPLES;
-    SSPD = sqrt(SSPD);
-    RMSSPD_v.push_back(SSPD);
-
-    SCRS /= NUM_SAMPLES;
-    SCRS = sqrt(SCRS);
-    RMSCRS_v.push_back(SCRS);
-
-    NEES /= NUM_SAMPLES;
-    NEES_v.push_back(NEES);
-
-    MOD2PR /= NUM_SAMPLES;
-    MOD2PR_v.push_back(MOD2PR);
     immCTData.close();
     immLData.close();
     kfData.close();
   }
-  double NORXEavg = average(NORXE_v);
-  double FPOSavg = average(FPOS_v);
-  double FVELavg = average(FVEL_v);
-  double RMSPOSavg = average(RMSPOS_v);
-  double RMSVELavg = average(RMSVEL_v);
-  double RMSSPDavg = average(RMSVEL_v);
-  double RMSCRSavg = average(RMSCRS_v);
-  double NEESavg = average(NEES_v);
-  double MOD2PRavg = average(MOD2PR_v);
-
-  cout<<"NORXEavg = "<<NORXEavg<<
-                "   FPOSavg = "<<FPOSavg<<endl<<
-                "   FVELavg = "<<FVELavg<<endl<<
-                "   RMSPOSavg = "<<RMSPOSavg<<endl<<
-                "   RMSVELavg = "<<RMSVELavg<<endl<<
-                "   RMSSPDavg = "<<RMSVELavg<<endl<<
-                "   RMSCRSavg = "<<RMSCRSavg<<endl<<
-                "   NEESavg = "<<NEESavg<<endl<<
-                "   MOD2PRavg = "<<MOD2PRavg<<endl;
-
-
 
   return 0;
 }
