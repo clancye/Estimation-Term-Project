@@ -82,17 +82,17 @@ void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovariance
   for(auto v:_performanceValueTuples) {
     VecPtr vec = get<0>(v.second);//get the vector
     PerformanceFunction f = get<1>(v.second);//get the performance function
-    if(_runCount==0)
-      vec->push_back(f(xEst,P,xReal));//need to populate vectors first
+    if (_runCount == 0){
+      vec->push_back(f(xEst, P, xReal));//need to populate vectors first
+      _sampleCount++;
+    }
     else
       (*vec)[_sampleCount] += f(xEst,P,xReal); //then we can perform addition assignment
   }
-  _sampleCount++;
 }
 
 void PerformanceEvaluator::FinishEvaluatingRun() {
   _runCount++;
-  _sampleCount = 0;
 }
 
 void PerformanceEvaluator::CalculateFinalResults() {
@@ -110,6 +110,7 @@ void PerformanceEvaluator::WriteResultsToFile() {
     for(auto d:*vec)of<<d<<endl;//write the vector into the file
     of.close();//close the file
   }
+  _runCount = 0;
 }
 
 void PerformanceEvaluator::ClearVectors() {
