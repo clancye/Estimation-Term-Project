@@ -30,7 +30,6 @@ class PerformanceEvaluator {
   volatile int _runCount = 0;
   string _filepath;
   map<string,tuple<VecPtr,PerformanceFunction,FinishFunction>> _performanceValueTuples;
-  map<string,vector<double>> _results;
 
   void ClearVectors();
   double Square(double x);

@@ -80,8 +80,8 @@ void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovariance
   SVref xReal = x;
 
   for(auto v:_performanceValueTuples) {
-    PerformanceFunction f = get<1>(v.second);
-    VecPtr vec = get<0>(v.second);
+    VecPtr vec = get<0>(v.second);//get the vector
+    PerformanceFunction f = get<1>(v.second);//get the performance function
     if(_runCount==0)
       vec->push_back(f(xEst,P,xReal));//need to populate vectors first
     else
@@ -96,15 +96,20 @@ void PerformanceEvaluator::FinishEvaluatingRun() {
 }
 
 void PerformanceEvaluator::CalculateFinalResults() {
-for(auto x:_performanceValueTuples) {
-  auto vec = get<0>(x.second);//get the vector
-  auto f = get<2>(x.second);//get the final function
-  f(vec);//apply the final operation i.e. compute the rest of RM, RMS, or average
-}
+  for(auto x:_performanceValueTuples) {
+    auto vec = get<0>(x.second);//get the vector
+    auto f = get<2>(x.second);//get the final function
+    f(vec);//apply the final operation i.e. compute the rest of RM, RMS, or average
+  }
 }
 
 void PerformanceEvaluator::WriteResultsToFile() {
-  cout<<"Writing results to file<----- need to write this code"<<endl;
+  for(auto x:_performanceValueTuples) {
+    ofstream of(_filepath+x.first+".txt");//open the file
+    auto vec = get<0>(x.second);//get the vector
+    for(auto d:*vec)of<<d<<endl;//write the vector into the file
+    of.close();//close the file
+  }
 }
 
 void PerformanceEvaluator::ClearVectors() {
