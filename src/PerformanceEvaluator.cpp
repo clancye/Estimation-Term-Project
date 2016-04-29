@@ -90,7 +90,15 @@ void PerformanceEvaluator::FinishEvaluating() {
     of<<key+"="<<_results[key]<<endl;
   }
   of.close();
+  ClearVectors();
   _sampleCount = 0;
+}
+
+void PerformanceEvaluator::ClearVectors() {
+  for(auto v:_performanceValueTuples) {
+    VecPtr vec = get<0>(v.second);
+    for(auto it = vec->begin();it != vec->end();it++) *it = 0.0;
+  }
 }
 
 void PerformanceEvaluator::SetFilename(string filename) {
@@ -98,54 +106,64 @@ void PerformanceEvaluator::SetFilename(string filename) {
 }
 
 double PerformanceEvaluator::CalculateAverage(VecPtr vec) {
-  return accumulate(vec->begin(),vec->end(),0.0)/(1.0*_sampleCount);//multiply by 1.0 to make it a double
+  double average = accumulate(vec->begin(),vec->end(),0.0)/(1.0*_sampleCount);//multiply by 1.0 to make it a double
+  return average;
 }
 
 double PerformanceEvaluator::CalculateRMS(VecPtr vec) {
+  for(auto x:*vec)cout<<x<<endl;
   double MS = accumulate(vec->begin(),vec->end(),0.0,[](double accum, double x) { return accum + x*x;})/(1.0*_sampleCount);
-  cout<<"MS =" <<MS<<endl;
-  return sqrt(MS);
+  cout<<"RMS =" <<sqrt(MS)<<endl;
+  MS = sqrt(MS);
+  return MS;
 }
 
 double PerformanceEvaluator::CalculateRM(VecPtr vec) {
-  return sqrt((accumulate(vec->begin(),vec->end(),0.0))/(1.0*_sampleCount));
+  double RM = sqrt((accumulate(vec->begin(),vec->end(),0.0))/(1.0*_sampleCount));
+  return RM;
 }
 
 double PerformanceEvaluator::CalculateNORXE(SVref xEst,SCMref P,SVref xReal) {
-  return (xReal(0) - xEst(0))/sqrt(P(0,0));
+  double NORXE = (xReal(0) - xEst(0))/sqrt(P(0,0));
+  return NORXE;
 }
 
 double PerformanceEvaluator::CalculateFPOS(SVref xEst,SCMref P,SVref xReal) {
-  return P(0,0)+P(2,2);
+  double FPOS = P(0,0)+P(2,2);
+  return FPOS;
 }
 
 double PerformanceEvaluator::CalculateFVEL(SVref xEst,SCMref P,SVref xReal) {
-  return P(1,1)+P(3,3);
+  double FVEL = P(1,1)+P(3,3);
+  return FVEL;
 }
 
 double PerformanceEvaluator::CalculatePOS(SVref xEst,SCMref P,SVref xReal) {
-  return sqrt(pow(xEst(0)-xReal(0),2) + pow(xEst(2)-xReal(2),2));
+  double POS = sqrt(pow(xEst(0)-xReal(0),2) + pow(xEst(2)-xReal(2),2));
+  return POS;
 }
 
 double PerformanceEvaluator::CalculateVEL(SVref xEst,SCMref P,SVref xReal) {
-  return sqrt(pow(xEst(1)-xReal(1),2) + pow(xEst(3)-xReal(3),2));
+  double VEL = sqrt(pow(xEst(1)-xReal(1),2) + pow(xEst(3)-xReal(3),2));
+  return VEL;
 }
 
 double PerformanceEvaluator::CalculateSPD(SVref xEst,SCMref P,SVref xReal) {
   double SPDEst = sqrt(pow(xEst(1),2) + pow(xEst(3),2));
   double SPDReal = sqrt(pow(xReal(1),2) + pow(xReal(3),2));
-  return SPDReal - SPDEst;
+  double SPD = SPDReal - SPDEst;
+  return SPD;
 }
 
 double PerformanceEvaluator::CalculateCRS(SVref xEst,SCMref P,SVref xReal) {
-  double CRSEst = atan2(xEst(3),xEst(1));
-  double CRSReal = atan2(xReal(3),xReal(1));
+  double CRSEst = abs(atan2(xEst(3),xEst(1)));
+  double CRSReal = abs(atan2(xReal(3),xReal(1)));
   double CRSdiff = CRSReal-CRSEst;
-  cout<<"CRSdiff = "<<CRSdiff<<endl;
   return CRSdiff;
 }
 
 double PerformanceEvaluator::CalculateNEES(SVref xEst,SCMref P,SVref xReal) {
   StateVector x = xReal - xEst;
-  return x.transpose()*P.inverse()*x;
+  double NEES = x.transpose()*P.inverse()*x;
+  return NEES;
 }

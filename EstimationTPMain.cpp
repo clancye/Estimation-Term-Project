@@ -178,7 +178,7 @@ int main() {
           0, 0, 0;//sigma v
   V3<<.1, 0, 0,
       0, .1, 0,
-      0, 0, .001;
+      0, 0, .005;
 
   StateVector x;
 
@@ -223,7 +223,7 @@ int main() {
       immCTData<<immCT;
       immLData<<immL;
       kfData<<kf2;
-      pe.EvaluateIntermediate(immL.GetEstimate(),target.Sample());
+      pe.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
       target.Advance(10);
     }
     pe.FinishEvaluating();

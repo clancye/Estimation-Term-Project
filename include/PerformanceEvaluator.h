@@ -30,6 +30,9 @@ class PerformanceEvaluator {
   string _filename;
   map<string,tuple<VecPtr,PerformanceFunction,function<double(VecPtr)>>> _performanceValueTuples;
   map<string,double> _results;
+
+  void ClearVectors();
+
   double CalculateNORXE(SVref xEst,SCMref P,SVref xReal);
   double CalculateFPOS(SVref xEst,SCMref P,SVref xReal);
   double CalculateFVEL(SVref xEst,SCMref P,SVref xReal);

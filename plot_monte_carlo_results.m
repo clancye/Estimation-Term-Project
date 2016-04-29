@@ -1,10 +1,13 @@
 clf
 path = "/home/clancy/Projects/Estimation Project 2016/Performance Data/performance";
 numberOfRuns = 5;
+aggregateData = zeros(8,1);
 for i = 0:numberOfRuns-1
   filename = strcat(path, mat2str(i),".txt");
   disp(filename);
   data = importdata(filename,"=");
-  plot(data.data(:,1));
+  aggregateData = aggregateData + data.data;
   kbhit();
 endfor
+
+disp(aggregateData);
