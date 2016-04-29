@@ -101,13 +101,8 @@ void PerformanceEvaluator::CalculateFinalResults() {
   for(auto x:_performanceValueTuples) {
     auto vec = get<0>(x.second);//get the vector
     auto f = get<2>(x.second);//get the final function
-    for(auto d:*vec)cout<<d<<endl;
-    cout<<"MIDDLE MIDDLE MIDDLE MIDDLE MIDDLE"<<endl;
     f(vec);//apply the final operation i.e. compute the rest of RM, RMS, or average
 
-    for(auto d:*vec)cout<<d<<endl;
-
-    cout<<"END END END END END"<<endl;
   }
 }
 
@@ -133,12 +128,12 @@ void PerformanceEvaluator::SetFilePath(string filepath) {
 }
 
 void PerformanceEvaluator::CalculateAverage(VecPtr vec) {
-  for_each(vec->begin(),vec->end(),[this](double& x) {x/(1.0*_runCount);});//multiply by 1.0 to make it a double
+  transform(vec->begin(),vec->end(),vec->begin(),[this](const double& x) {return x/(1.0*_runCount);});//multiply by 1.0 to make it a double
 }
 
 void PerformanceEvaluator::CalculateRM(VecPtr vec) {
   CalculateAverage(vec);
-  for_each(vec->begin(),vec->end(),[](double& x) {sqrt(x);});
+  transform(vec->begin(),vec->end(),vec->begin(),[](const double& x) {return sqrt(x);});
 }
 
 double PerformanceEvaluator::CalculateNORXE(SVref xEst,SCMref P,SVref xReal) {
