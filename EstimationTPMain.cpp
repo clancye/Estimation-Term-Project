@@ -133,7 +133,7 @@ double average(vector<double> vec) {
 
 int main() {
   cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
-  string dataset,filename, configID,performance, path="/home/clancy/Projects/Estimation Project 2016/", performancePath = path+"Performance Data/";
+  string dataset,filename, configID,performance, path="/home/clancy/Projects/Estimation Project 2016/";
   cin >> dataset;
   if(dataset == "1") {
     filename = path + "Term Project Data.txt";
@@ -182,8 +182,21 @@ int main() {
 
   StateVector x;
 
-  PerformanceEvaluator pe;
-  pe.SetFilePath(performancePath);
+  PerformanceEvaluator peKF,peIMMCT,peIMML;
+  string performancePath = path+"Performance Data/";
+  string immLPerformancePath = performancePath+"immL/";
+  string immCTPerformancePath = performancePath+"immCT/";
+  string kfPerformancePath = performancePath+"kf/";
+
+  vector<PerformanceEvaluator*> PEs;
+  peKF.SetFilePath(kfPerformancePath);
+  peIMMCT.SetFilePath(immCTPerformancePath);
+  peIMML.SetFilePath(immLPerformancePath);
+
+  PEs.push_back(&peIMMCT);
+  PEs.push_back(&peIMML);
+  PEs.push_back(&peKF);
+
   for(int j = 0;j<NUM_TRIALS;j++) {
 
 
@@ -221,15 +234,19 @@ int main() {
       immCTData<<immCT;
       immLData<<immL;
       kfData<<kf2;
-      pe.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
+      peIMMCT.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
+      peIMML.EvaluateIntermediate(immL.GetEstimate(),target.Sample());
+      peKF.EvaluateIntermediate(kf2.GetEstimate(),target.Sample());
       target.Advance(10);
     }
-    pe.FinishEvaluatingRun();
+    for(auto pe:PEs) pe->FinishEvaluatingRun();
     immCTData.close();
     immLData.close();
     kfData.close();
   }
-  pe.CalculateFinalResults();
-  pe.WriteResultsToFile();
+  for(auto pe:PEs) {
+    pe->CalculateFinalResults();
+    pe->WriteResultsToFile();
+  }
   return 0;
 }
