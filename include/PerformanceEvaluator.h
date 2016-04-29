@@ -28,6 +28,7 @@ using FinishFunction = function<void(VecPtr)>;
 class PerformanceEvaluator {
   volatile int _sampleCount = 0;
   volatile int _runCount = 0;
+  int _finalSampleCount;
   string _filepath;
   map<string,tuple<VecPtr,PerformanceFunction,FinishFunction>> _performanceValueTuples;
 

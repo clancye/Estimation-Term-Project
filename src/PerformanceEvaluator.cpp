@@ -82,16 +82,20 @@ void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovariance
   for(auto v:_performanceValueTuples) {
     VecPtr vec = get<0>(v.second);//get the vector
     PerformanceFunction f = get<1>(v.second);//get the performance function
-    if (_runCount == 0){
+    if (_runCount == 0) {
       vec->push_back(f(xEst, P, xReal));//need to populate vectors first
-      _sampleCount++;
     }
-    else
-      (*vec)[_sampleCount] += f(xEst,P,xReal); //then we can perform addition assignment
+    else {
+      (*vec)[_sampleCount] += f(xEst, P, xReal); //then we can perform addition assignment
+    }
   }
+  _sampleCount++;
 }
 
 void PerformanceEvaluator::FinishEvaluatingRun() {
+  if(_runCount == 0) _finalSampleCount = _sampleCount;
+  cout<<"_runCount = "<<_runCount<<endl<<"_finalSampleCount = "<<_finalSampleCount<<endl<<"_sampleCount = "<<_sampleCount<<endl;
+  _sampleCount = 0;
   _runCount++;
 }
 
@@ -125,7 +129,7 @@ void PerformanceEvaluator::SetFilePath(string filepath) {
 }
 
 void PerformanceEvaluator::CalculateAverage(VecPtr vec) {
-  for_each(vec->begin(),vec->end(),[this](double x) { return x/(1.0*_sampleCount);});//multiply by 1.0 to make it a double
+  for_each(vec->begin(),vec->end(),[this](double x) { return x/(1.0*_finalSampleCount);});//multiply by 1.0 to make it a double
 }
 
 void PerformanceEvaluator::CalculateRM(VecPtr vec) {
