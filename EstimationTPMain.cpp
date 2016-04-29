@@ -183,12 +183,10 @@ int main() {
   StateVector x;
 
   PerformanceEvaluator pe;
-
+  pe.SetFilePath(performancePath);
   for(int j = 0;j<NUM_TRIALS;j++) {
 
 
-    performance = performancePath+"performance"+to_string(j)+".txt";
-    pe.SetFilename(performance);
     /*Make the target*/
     Target target(filename);//instantiate the target
     KalmanFilter kf1 = setupKalmanFilter(sensorState, Ts, V1, sigmaR, sigmaTheta);
@@ -226,11 +224,11 @@ int main() {
       pe.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
       target.Advance(10);
     }
-    pe.FinishEvaluating();
+    pe.FinishEvaluatingRun();
     immCTData.close();
     immLData.close();
     kfData.close();
   }
-
+  pe.WriteResultsToFile();
   return 0;
 }

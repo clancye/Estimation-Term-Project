@@ -27,9 +27,9 @@ using FinishFunction = function<double(VecPtr)>;
 
 class PerformanceEvaluator {
   volatile int _sampleCount = 0;
-  string _filename;
+  string _filepath;
   map<string,tuple<VecPtr,PerformanceFunction,function<double(VecPtr)>>> _performanceValueTuples;
-  map<string,double> _results;
+  map<string,vector<double>> _results;
 
   void ClearVectors();
 
@@ -49,9 +49,12 @@ class PerformanceEvaluator {
   public:
   PerformanceEvaluator();
   PerformanceEvaluator(string filename);
+
   void EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate, StateVector xReal);
-  void FinishEvaluating();
-  void SetFilename(string filename);
+  void FinishEvaluatingRun();
+  void WriteResultsToFile();
+
+  void SetFilePath(string filename);
 
 };
 

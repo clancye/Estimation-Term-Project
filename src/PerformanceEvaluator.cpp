@@ -4,8 +4,8 @@
 
 #include "../include/PerformanceEvaluator.h"
 
-PerformanceEvaluator::PerformanceEvaluator(string filename):PerformanceEvaluator(){
-  SetFilename(filename);
+PerformanceEvaluator::PerformanceEvaluator(string filepath):PerformanceEvaluator(){
+  SetFilePath(filepath);
 }
 
 PerformanceEvaluator::PerformanceEvaluator(){
@@ -80,18 +80,23 @@ void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovariance
   _sampleCount++;
 }
 
-void PerformanceEvaluator::FinishEvaluating() {
-  ofstream of(_filename);
+void PerformanceEvaluator::FinishEvaluatingRun() {
   for(auto v:_performanceValueTuples) {
     string key = v.first;
     FinishFunction f = get<2>(v.second);
     VecPtr vec = get<0>(v.second);
-    _results[key] = f(vec);
-    of<<key+"="<<_results[key]<<endl;
+    _results[key].push_back(f(vec));
   }
-  of.close();
   ClearVectors();
   _sampleCount = 0;
+}
+
+void PerformanceEvaluator::WriteResultsToFile() {
+  for(auto x:_results){
+    ofstream of(_filepath+x.first+".txt");
+    for(auto d:x.second)of<<d<<endl;//write all the values in that vector to file
+    of.close();
+  }
 }
 
 void PerformanceEvaluator::ClearVectors() {
@@ -101,8 +106,8 @@ void PerformanceEvaluator::ClearVectors() {
   }
 }
 
-void PerformanceEvaluator::SetFilename(string filename) {
-  _filename = filename;
+void PerformanceEvaluator::SetFilePath(string filepath) {
+  _filepath = filepath;
 }
 
 double PerformanceEvaluator::CalculateAverage(VecPtr vec) {
@@ -111,9 +116,9 @@ double PerformanceEvaluator::CalculateAverage(VecPtr vec) {
 }
 
 double PerformanceEvaluator::CalculateRMS(VecPtr vec) {
-  for(auto x:*vec)cout<<x<<endl;
+  //for(auto x:*vec)cout<<x<<endl;
   double MS = accumulate(vec->begin(),vec->end(),0.0,[](double accum, double x) { return accum + x*x;})/(1.0*_sampleCount);
-  cout<<"RMS =" <<sqrt(MS)<<endl;
+  //cout<<"RMS =" <<sqrt(MS)<<endl;
   MS = sqrt(MS);
   return MS;
 }
