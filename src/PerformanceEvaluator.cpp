@@ -93,8 +93,6 @@ void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovariance
 }
 
 void PerformanceEvaluator::FinishEvaluatingRun() {
-  if(_runCount == 0) _finalSampleCount = _sampleCount;
-  cout<<"_runCount = "<<_runCount<<endl<<"_finalSampleCount = "<<_finalSampleCount<<endl<<"_sampleCount = "<<_sampleCount<<endl;
   _sampleCount = 0;
   _runCount++;
 }
@@ -103,7 +101,13 @@ void PerformanceEvaluator::CalculateFinalResults() {
   for(auto x:_performanceValueTuples) {
     auto vec = get<0>(x.second);//get the vector
     auto f = get<2>(x.second);//get the final function
+    for(auto d:*vec)cout<<d<<endl;
+    cout<<"MIDDLE MIDDLE MIDDLE MIDDLE MIDDLE"<<endl;
     f(vec);//apply the final operation i.e. compute the rest of RM, RMS, or average
+
+    for(auto d:*vec)cout<<d<<endl;
+
+    cout<<"END END END END END"<<endl;
   }
 }
 
@@ -129,12 +133,12 @@ void PerformanceEvaluator::SetFilePath(string filepath) {
 }
 
 void PerformanceEvaluator::CalculateAverage(VecPtr vec) {
-  for_each(vec->begin(),vec->end(),[this](double x) { return x/(1.0*_finalSampleCount);});//multiply by 1.0 to make it a double
+  for_each(vec->begin(),vec->end(),[this](double& x) {x/(1.0*_runCount);});//multiply by 1.0 to make it a double
 }
 
 void PerformanceEvaluator::CalculateRM(VecPtr vec) {
   CalculateAverage(vec);
-  for_each(vec->begin(),vec->end(),[](double x) { return sqrt(x);});
+  for_each(vec->begin(),vec->end(),[](double& x) {sqrt(x);});
 }
 
 double PerformanceEvaluator::CalculateNORXE(SVref xEst,SCMref P,SVref xReal) {
