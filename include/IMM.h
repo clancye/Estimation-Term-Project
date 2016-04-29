@@ -31,6 +31,7 @@ class IMM {
 
   pair<StateVector,StateCovarianceMatrix> Update(MeasurementVector z);
   pair<StateVector,StateCovarianceMatrix> GetEstimate();
+  MeasurementVector GetRealZ();
 
   double GetNORXE(StateVector x);
   double GetFPOS();

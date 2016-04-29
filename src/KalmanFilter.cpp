@@ -113,6 +113,10 @@ double KalmanFilter::GetLikelihood() {
   return Lambda;
 }
 
+MeasurementVector KalmanFilter::GetRealZ() {
+  return _zReal;
+}
+
 ofstream& operator<<(ofstream& of,  const KalmanFilter& filter) {
   IOFormat myFormat(StreamPrecision, 0, ", ", ",", "", "", "", "");//Formatting for outputting Eigen matrix
   //of << "t = "<<filter._t<<endl;

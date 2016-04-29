@@ -126,6 +126,10 @@ void IMM::Estimate() {
   }
 }
 
+MeasurementVector IMM::GetRealZ() {
+  return _filters[0].GetRealZ();
+}
+
 double IMM::GetNORXE(StateVector x) {
   double xSquig = x(0)-_x(0);
   xSquig = xSquig/sqrt(_P(0,0));

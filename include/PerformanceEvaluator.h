@@ -49,7 +49,7 @@ class PerformanceEvaluator {
   PerformanceEvaluator();
   PerformanceEvaluator(string filename);
 
-  void EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate,double MOD2PR, StateVector xReal);
+  void EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate,double MOD2PR,MeasurementVector z, StateVector xReal);
   void FinishEvaluatingRun();
   void CalculateFinalResults();
   void WriteResultsToFile();

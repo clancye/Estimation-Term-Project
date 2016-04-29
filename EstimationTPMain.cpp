@@ -132,21 +132,10 @@ double average(vector<double> vec) {
 }
 
 int main() {
-  cout<<"Which data set do you want to use?"<<endl<<"1 - Term Project"<<endl<<"2 - Example from page 218"<<endl<<"3 - test"<<endl;
-  string dataset,filename, configID,performance, path="/home/clancy/Projects/Estimation Project 2016/";
-  cin >> dataset;
-  if(dataset == "1") {
-    filename = path + "Term Project Data.txt";
-    configID = "term project";//check DataGenerator.h for correct config IDs
-  }
-  else if(dataset == "2") {
-    filename = path + "page218Example.txt";
-    configID = "pg218 example";//check DataGenerator.h for correct config IDs
-  }
-  else if(dataset == "3") {
-    filename = path + "test.txt";
-    configID = "term project";//check DataGenerator.h for correct config IDs
-  }
+  string dataset,filename, configID,performance, path="/home/clancy/Projects/Estimation Project 2016/Testing Data/";
+
+  filename = path + "Generated Target Trajectories/Term Project Data.txt";
+  configID = "term project";//check DataGenerator.h for correct config IDs
 
   /*Generate Data */
   /*cout << "Generating data in file " << filename<<endl;
@@ -234,9 +223,9 @@ int main() {
       immCTData<<immCT;
       immLData<<immL;
       kfData<<kf2;
-      peIMMCT.EvaluateIntermediate(immCT.GetEstimate(),immCT.GetMOD2PR(),target.Sample());
-      peIMML.EvaluateIntermediate(immL.GetEstimate(),immCT.GetMOD2PR(),target.Sample());
-      peKF.EvaluateIntermediate(kf2.GetEstimate(),0,target.Sample());
+      peIMMCT.EvaluateIntermediate(immCT.GetEstimate(),immCT.GetMOD2PR(),immCT.GetRealZ(),target.Sample());
+      peIMML.EvaluateIntermediate(immL.GetEstimate(),immL.GetMOD2PR(),immL.GetRealZ(),target.Sample());
+      peKF.EvaluateIntermediate(kf2.GetEstimate(),0,kf2.GetRealZ(),target.Sample());
       target.Advance(10);
     }
     for(auto pe:PEs) pe->FinishEvaluatingRun();

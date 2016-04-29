@@ -72,30 +72,39 @@ PerformanceEvaluator::PerformanceEvaluator(){
                                                FinishFunction([=](VecPtr vec) {
                                                  return CalculateAverage(vec);
                                                }));
+  _performanceValueTuples["RAWRMSPOS"] = make_tuple(make_shared<vector<double>>(),
+                                                 PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
+                                                   return Square(CalculatePOS(xEst,P,xReal));
+                                                 }),
+                                                 FinishFunction([=](VecPtr vec) {
+                                                   return CalculateRM(vec);
+                                                 }));
+
 }
 
 void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate,
                                                 double MOD2PR,
+                                                MeasurementVector z,
                                                 StateVector x) {
   SVref xEst = estimate.first;
   SCMref P = estimate.second;
   SVref xReal = x;
+  StateVector zTemp;
+  zTemp << z(0),0,z(1),0,0;
 
   for(auto v:_performanceValueTuples) {
     string key = v.first;
     VecPtr vec = get<0>(v.second);//get the vector
     PerformanceFunction f = get<1>(v.second);//get the performance function
     if (_runCount == 0) {
-      if(key == "MOD2PR")
-        vec->push_back(MOD2PR);
-      else
-      vec->push_back(f(xEst, P, xReal));//need to populate vectors first
+      if(key == "MOD2PR"){vec->push_back(MOD2PR);}
+      else if(key=="RAWRMSPOS"){vec->push_back(f(zTemp,P,xReal));}
+      else{vec->push_back(f(xEst, P, xReal));}
     }
     else {
-      if(key == "MOD2PR")
-        (*vec)[_sampleCount]+=MOD2PR;
-      else
-      (*vec)[_sampleCount] += f(xEst, P, xReal); //then we can perform addition assignment
+      if(key == "MOD2PR"){(*vec)[_sampleCount]+=MOD2PR;}
+      else if(key=="RAWRMSPOS"){(*vec)[_sampleCount]+=f(zTemp,P,xReal);}
+      else{ (*vec)[_sampleCount] += f(xEst, P, xReal);} //then we can perform addition assignment
     }
   }
   _sampleCount++;
