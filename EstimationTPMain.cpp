@@ -187,6 +187,7 @@ int main() {
   string immLPerformancePath = performancePath+"immL/";
   string immCTPerformancePath = performancePath+"immCT/";
   string kfPerformancePath = performancePath+"kf/";
+  string rawPerformancePath = performancePath+"raw/";
 
   vector<PerformanceEvaluator*> PEs;
   peKF.SetFilePath(kfPerformancePath);

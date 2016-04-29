@@ -29,7 +29,7 @@ class PerformanceEvaluator {
   volatile int _sampleCount = 0;
   volatile int _runCount = 0;
   int _finalSampleCount;
-  string _filepath;
+  string _filepath,_rawPerformancePath;
   map<string,tuple<VecPtr,PerformanceFunction,FinishFunction>> _performanceValueTuples;
 
   void ClearVectors();
@@ -56,7 +56,8 @@ class PerformanceEvaluator {
   void CalculateFinalResults();
   void WriteResultsToFile();
 
-  void SetFilePath(string filename);
+  void SetFilePath(string filepath);
+  void SetRawPerformancePath(string filepath);
 
 };
 

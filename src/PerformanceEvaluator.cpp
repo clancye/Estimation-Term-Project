@@ -127,6 +127,10 @@ void PerformanceEvaluator::SetFilePath(string filepath) {
   _filepath = filepath;
 }
 
+void PerformanceEvaluator::SetRawPerformancePath(string filepath) {
+  _rawPerformancePath = filepath;
+}
+
 void PerformanceEvaluator::CalculateAverage(VecPtr vec) {
   transform(vec->begin(),vec->end(),vec->begin(),[this](const double& x) {return x/(1.0*_runCount);});//multiply by 1.0 to make it a double
 }
