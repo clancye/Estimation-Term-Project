@@ -1,7 +1,7 @@
-rootPath = "/home/clancy/Projects/Estimation Project 2016/";
-immLPath = strcat(rootPath , "Performance Data/immL/");
-immCTPath = strcat(rootPath , "Performance Data/immCT/");
-kfPath = strcat(rootPath , "Performance Data/kf/");
+rootPath = "/home/clancy/Projects/Estimation Project 2016/Testing Data/Performance Data/";
+immLPath = strcat(rootPath , "immL/");
+immCTPath = strcat(rootPath , "immCT/");
+kfPath = strcat(rootPath , "kf/");
 keys = ["FPOS","FVEL","NEES","NORXE","RMSCRS","RMSPOS","RMSSPD","RMSVEL"];
 
 immL.FPOS = load(strcat(immLPath,"FPOS.txt"));
