@@ -23,15 +23,17 @@ using SVref = StateVector&;
 using SCMref = StateCovarianceMatrix&;
 using PerformanceFunction = function<double(SVref,SCMref,SVref)>;
 using VecPtr = shared_ptr<vector<double>>;
-using FinishFunction = function<double(VecPtr)>;
+using FinishFunction = function<void(VecPtr)>;
 
 class PerformanceEvaluator {
   volatile int _sampleCount = 0;
+  volatile int _runCount = 0;
   string _filepath;
-  map<string,tuple<VecPtr,PerformanceFunction,function<double(VecPtr)>>> _performanceValueTuples;
+  map<string,tuple<VecPtr,PerformanceFunction,FinishFunction>> _performanceValueTuples;
   map<string,vector<double>> _results;
 
   void ClearVectors();
+  double Square(double x);
 
   double CalculateNORXE(SVref xEst,SCMref P,SVref xReal);
   double CalculateFPOS(SVref xEst,SCMref P,SVref xReal);
@@ -42,9 +44,8 @@ class PerformanceEvaluator {
   double CalculateCRS(SVref xEst,SCMref P,SVref xReal);
   double CalculateNEES(SVref xEst,SCMref P,SVref xReal);
 
-  double CalculateAverage(VecPtr vec);//mean
-  double CalculateRMS(VecPtr vec);//root mean square
-  double CalculateRM(VecPtr vec);//root mean
+  void CalculateAverage(VecPtr vec);//mean
+  void CalculateRM(VecPtr vec);//root mean
 
   public:
   PerformanceEvaluator();
@@ -52,6 +53,7 @@ class PerformanceEvaluator {
 
   void EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate, StateVector xReal);
   void FinishEvaluatingRun();
+  void CalculateFinalResults();
   void WriteResultsToFile();
 
   void SetFilePath(string filename);

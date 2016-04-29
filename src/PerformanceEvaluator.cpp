@@ -32,31 +32,31 @@ PerformanceEvaluator::PerformanceEvaluator(){
                                                 }));
   _performanceValueTuples["RMSPOS"] = make_tuple(make_shared<vector<double>>(),
                                                 PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
-                                                  return CalculatePOS(xEst,P,xReal);
+                                                  return Square(CalculatePOS(xEst,P,xReal));
                                                 }),
                                                 FinishFunction([=](VecPtr vec) {
-                                                  return CalculateRMS(vec);
+                                                  return CalculateRM(vec);
                                                 }));
   _performanceValueTuples["RMSVEL"] = make_tuple(make_shared<vector<double>>(),
                                                  PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
-                                                   return CalculateVEL(xEst,P,xReal);
+                                                   return Square(CalculateVEL(xEst,P,xReal));
                                                  }),
                                                  FinishFunction([=](VecPtr vec) {
-                                                   return CalculateRMS(vec);
+                                                   return CalculateRM(vec);
                                                  }));
   _performanceValueTuples["RMSSPD"] = make_tuple(make_shared<vector<double>>(),
                                                  PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
-                                                   return CalculateSPD(xEst,P,xReal);
+                                                   return Square(CalculateSPD(xEst,P,xReal));
                                                  }),
                                                  FinishFunction([=](VecPtr vec) {
-                                                   return CalculateRMS(vec);
+                                                   return CalculateRM(vec);
                                                  }));
   _performanceValueTuples["RMSCRS"] = make_tuple(make_shared<vector<double>>(),
                                                  PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
-                                                   return CalculateCRS(xEst,P,xReal);
+                                                   return Square(CalculateCRS(xEst,P,xReal));
                                                  }),
                                                  FinishFunction([=](VecPtr vec) {
-                                                   return CalculateRMS(vec);
+                                                   return CalculateRM(vec);
                                                  }));
   _performanceValueTuples["NEES"] = make_tuple(make_shared<vector<double>>(),
                                                  PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
@@ -65,6 +65,13 @@ PerformanceEvaluator::PerformanceEvaluator(){
                                                  FinishFunction([=](VecPtr vec) {
                                                    return CalculateAverage(vec);
                                                  }));
+  /*_performanceValueTuples["MOD2PR"] = make_tuple(make_shared<vector<double>>(),
+                                               PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
+                                                 return CalculateMOD2PR(xEst,P,xReal);
+                                               }),
+                                               FinishFunction([=](VecPtr vec) {
+                                                 return CalculateAverage(vec);
+                                               }));*/
 }
 
 void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate, StateVector x) {
@@ -75,28 +82,29 @@ void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovariance
   for(auto v:_performanceValueTuples) {
     PerformanceFunction f = get<1>(v.second);
     VecPtr vec = get<0>(v.second);
-    vec->push_back(f(xEst,P,xReal));
+    if(_runCount==0)
+      vec->push_back(f(xEst,P,xReal));//need to populate vectors first
+    else
+      (*vec)[_sampleCount] += f(xEst,P,xReal); //then we can perform addition assignment
   }
   _sampleCount++;
 }
 
 void PerformanceEvaluator::FinishEvaluatingRun() {
-  for(auto v:_performanceValueTuples) {
-    string key = v.first;
-    FinishFunction f = get<2>(v.second);
-    VecPtr vec = get<0>(v.second);
-    _results[key].push_back(f(vec));
-  }
-  ClearVectors();
+  _runCount++;
   _sampleCount = 0;
 }
 
+void PerformanceEvaluator::CalculateFinalResults() {
+for(auto x:_performanceValueTuples) {
+  auto vec = get<0>(x.second);//get the vector
+  auto f = get<2>(x.second);//get the final function
+  f(vec);//apply the final operation i.e. compute the rest of RM, RMS, or average
+}
+}
+
 void PerformanceEvaluator::WriteResultsToFile() {
-  for(auto x:_results){
-    ofstream of(_filepath+x.first+".txt");
-    for(auto d:x.second)of<<d<<endl;//write all the values in that vector to file
-    of.close();
-  }
+  cout<<"Writing results to file<----- need to write this code"<<endl;
 }
 
 void PerformanceEvaluator::ClearVectors() {
@@ -110,22 +118,13 @@ void PerformanceEvaluator::SetFilePath(string filepath) {
   _filepath = filepath;
 }
 
-double PerformanceEvaluator::CalculateAverage(VecPtr vec) {
-  double average = accumulate(vec->begin(),vec->end(),0.0)/(1.0*_sampleCount);//multiply by 1.0 to make it a double
-  return average;
+void PerformanceEvaluator::CalculateAverage(VecPtr vec) {
+  for_each(vec->begin(),vec->end(),[this](double x) { return x/(1.0*_sampleCount);});//multiply by 1.0 to make it a double
 }
 
-double PerformanceEvaluator::CalculateRMS(VecPtr vec) {
-  //for(auto x:*vec)cout<<x<<endl;
-  double MS = accumulate(vec->begin(),vec->end(),0.0,[](double accum, double x) { return accum + x*x;})/(1.0*_sampleCount);
-  //cout<<"RMS =" <<sqrt(MS)<<endl;
-  MS = sqrt(MS);
-  return MS;
-}
-
-double PerformanceEvaluator::CalculateRM(VecPtr vec) {
-  double RM = sqrt((accumulate(vec->begin(),vec->end(),0.0))/(1.0*_sampleCount));
-  return RM;
+void PerformanceEvaluator::CalculateRM(VecPtr vec) {
+  CalculateAverage(vec);
+  for_each(vec->begin(),vec->end(),[](double x) { return sqrt(x);});
 }
 
 double PerformanceEvaluator::CalculateNORXE(SVref xEst,SCMref P,SVref xReal) {
@@ -144,12 +143,14 @@ double PerformanceEvaluator::CalculateFVEL(SVref xEst,SCMref P,SVref xReal) {
 }
 
 double PerformanceEvaluator::CalculatePOS(SVref xEst,SCMref P,SVref xReal) {
-  double POS = sqrt(pow(xEst(0)-xReal(0),2) + pow(xEst(2)-xReal(2),2));
+  double xDiff = xEst(0)-xReal(0), yDiff = xEst(2)-xReal(2);
+  double POS = sqrt(pow(xDiff,2) + pow(yDiff,2));
   return POS;
 }
 
 double PerformanceEvaluator::CalculateVEL(SVref xEst,SCMref P,SVref xReal) {
-  double VEL = sqrt(pow(xEst(1)-xReal(1),2) + pow(xEst(3)-xReal(3),2));
+  double xDiff = xEst(1)-xReal(1), yDiff = xEst(3)-xReal(3);
+  double VEL = sqrt(pow(xDiff,2) + pow(yDiff,2));
   return VEL;
 }
 
@@ -171,4 +172,8 @@ double PerformanceEvaluator::CalculateNEES(SVref xEst,SCMref P,SVref xReal) {
   StateVector x = xReal - xEst;
   double NEES = x.transpose()*P.inverse()*x;
   return NEES;
+}
+
+double PerformanceEvaluator::Square(double x){
+  return pow(x,2);
 }

@@ -192,7 +192,7 @@ int main() {
     KalmanFilter kf1 = setupKalmanFilter(sensorState, Ts, V1, sigmaR, sigmaTheta);
     KalmanFilter kf2 = setupKalmanFilter(sensorState,Ts,V2,sigmaR,sigmaTheta);
     ExtendedKalmanFilter ekf1 = setupExtendedKalmanFilter(sensorState, Ts, V3, sigmaR, sigmaTheta);
-
+    /*Get the initial  measurements*/
     MeasurementVector z0, z1;
     z0(0) = range.Measure(target);
     z0(1) = azimuth.Measure(target);
@@ -229,6 +229,7 @@ int main() {
     immLData.close();
     kfData.close();
   }
+  pe.CalculateFinalResults();
   pe.WriteResultsToFile();
   return 0;
 }
