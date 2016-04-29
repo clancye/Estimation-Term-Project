@@ -49,6 +49,7 @@ void KalmanFilter::Initialize(MeasurementVector z0, MeasurementVector z1) {
 
 pair<StateVector,StateCovarianceMatrix> KalmanFilter::Update(MeasurementVector measurement) {
   measurement = ConvertToCartesian(measurement);
+  _zReal = measurement;
   _F = _generateSystemMatrix(_x);
   UpdateCovarianceAndGain();
   UpdateStateEstimate(measurement);

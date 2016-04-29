@@ -24,7 +24,7 @@ class KalmanFilter {
   volatile int _t = 0;//actual time in units in which the system advances
 
   StateVector _x;//state estimate
-  MeasurementVector _z, _v;// measurement estimate, and residual
+  MeasurementVector _z,_zReal,_v;// measurement estimate,real measurement, and residual
   StateCovarianceMatrix _P;//covariance matrix
   GainMatrix _W;//gain matrix
   SystemMatrix _F;//system matrix

@@ -65,27 +65,36 @@ PerformanceEvaluator::PerformanceEvaluator(){
                                                  FinishFunction([=](VecPtr vec) {
                                                    return CalculateAverage(vec);
                                                  }));
-  /*_performanceValueTuples["MOD2PR"] = make_tuple(make_shared<vector<double>>(),
-                                               PerformanceFunction([=](SVref xEst,SCMref P,SVref xReal) {
-                                                 return CalculateMOD2PR(xEst,P,xReal);
+  _performanceValueTuples["MOD2PR"] = make_tuple(make_shared<vector<double>>(),
+                                               PerformanceFunction([](SVref xEst,SCMref P,SVref xReal) {
+                                                 return -99999.99999;//this will never happen
                                                }),
                                                FinishFunction([=](VecPtr vec) {
                                                  return CalculateAverage(vec);
-                                               }));*/
+                                               }));
 }
 
-void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate, StateVector x) {
+void PerformanceEvaluator::EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate,
+                                                double MOD2PR,
+                                                StateVector x) {
   SVref xEst = estimate.first;
   SCMref P = estimate.second;
   SVref xReal = x;
 
   for(auto v:_performanceValueTuples) {
+    string key = v.first;
     VecPtr vec = get<0>(v.second);//get the vector
     PerformanceFunction f = get<1>(v.second);//get the performance function
     if (_runCount == 0) {
+      if(key == "MOD2PR")
+        vec->push_back(MOD2PR);
+      else
       vec->push_back(f(xEst, P, xReal));//need to populate vectors first
     }
     else {
+      if(key == "MOD2PR")
+        (*vec)[_sampleCount]+=MOD2PR;
+      else
       (*vec)[_sampleCount] += f(xEst, P, xReal); //then we can perform addition assignment
     }
   }
@@ -116,20 +125,10 @@ void PerformanceEvaluator::WriteResultsToFile() {
   _runCount = 0;
 }
 
-void PerformanceEvaluator::ClearVectors() {
-  for(auto v:_performanceValueTuples) {
-    VecPtr vec = get<0>(v.second);
-    for(auto it = vec->begin();it != vec->end();it++) *it = 0.0;
-  }
-}
-
 void PerformanceEvaluator::SetFilePath(string filepath) {
   _filepath = filepath;
 }
 
-void PerformanceEvaluator::SetRawPerformancePath(string filepath) {
-  _rawPerformancePath = filepath;
-}
 
 void PerformanceEvaluator::CalculateAverage(VecPtr vec) {
   transform(vec->begin(),vec->end(),vec->begin(),[this](const double& x) {return x/(1.0*_runCount);});//multiply by 1.0 to make it a double

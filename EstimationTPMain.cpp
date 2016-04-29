@@ -176,8 +176,8 @@ int main() {
   V2 << 6.0, 0, 0,
           0, 6.0, 0,
           0, 0, 0;//sigma v
-  V3<<.1, 0, 0,
-      0, .1, 0,
+  V3<<1, 0, 0,
+      0, 1, 0,
       0, 0, .005;
 
   StateVector x;
@@ -187,7 +187,6 @@ int main() {
   string immLPerformancePath = performancePath+"immL/";
   string immCTPerformancePath = performancePath+"immCT/";
   string kfPerformancePath = performancePath+"kf/";
-  string rawPerformancePath = performancePath+"raw/";
 
   vector<PerformanceEvaluator*> PEs;
   peKF.SetFilePath(kfPerformancePath);
@@ -235,9 +234,9 @@ int main() {
       immCTData<<immCT;
       immLData<<immL;
       kfData<<kf2;
-      peIMMCT.EvaluateIntermediate(immCT.GetEstimate(),target.Sample());
-      peIMML.EvaluateIntermediate(immL.GetEstimate(),target.Sample());
-      peKF.EvaluateIntermediate(kf2.GetEstimate(),target.Sample());
+      peIMMCT.EvaluateIntermediate(immCT.GetEstimate(),immCT.GetMOD2PR(),target.Sample());
+      peIMML.EvaluateIntermediate(immL.GetEstimate(),immCT.GetMOD2PR(),target.Sample());
+      peKF.EvaluateIntermediate(kf2.GetEstimate(),0,target.Sample());
       target.Advance(10);
     }
     for(auto pe:PEs) pe->FinishEvaluatingRun();

@@ -28,11 +28,9 @@ using FinishFunction = function<void(VecPtr)>;
 class PerformanceEvaluator {
   volatile int _sampleCount = 0;
   volatile int _runCount = 0;
-  int _finalSampleCount;
-  string _filepath,_rawPerformancePath;
+  string _filepath;
   map<string,tuple<VecPtr,PerformanceFunction,FinishFunction>> _performanceValueTuples;
 
-  void ClearVectors();
   double Square(double x);
 
   double CalculateNORXE(SVref xEst,SCMref P,SVref xReal);
@@ -51,7 +49,7 @@ class PerformanceEvaluator {
   PerformanceEvaluator();
   PerformanceEvaluator(string filename);
 
-  void EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate, StateVector xReal);
+  void EvaluateIntermediate(pair<StateVector,StateCovarianceMatrix> estimate,double MOD2PR, StateVector xReal);
   void FinishEvaluatingRun();
   void CalculateFinalResults();
   void WriteResultsToFile();
