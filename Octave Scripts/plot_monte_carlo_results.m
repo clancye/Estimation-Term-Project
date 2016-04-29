@@ -7,6 +7,9 @@
 %
 %   and is accesed by immL.FPOS, for example
 
+plot_all;
+pause
+
 load_performance_data;
 
 %%               RMSPOS              %%
