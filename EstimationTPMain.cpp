@@ -145,10 +145,7 @@ int main() {
 
   /*Make the sensors*/
   StateVector sensorState;
-  if(dataset == "1")//1 means term project
-    sensorState << -10000,0,0,0,0;//for term project
-  else
-    sensorState<< 0,0,0,0,0;//for example from page 218
+  sensorState << -10000,0,0,0,0;//for term project
 
   double sigmaR = 50, sigmaTheta = .01745;
 
